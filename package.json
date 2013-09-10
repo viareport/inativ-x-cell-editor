@@ -1,0 +1,34 @@
+{
+  "name": "inativ-x-cell-editor",
+  "description": "edit in place pour le datagrid",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:viareport/inativ-x-cell-editor.git"
+  },
+  "main": "./dist/main.js",
+  "keywords": [
+  ],
+  "devDependencies": {
+    "bower": "0.7.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-compass": "0.1.3",
+    "grunt-contrib-connect": "~0.3.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.3.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-browserify": "~1.2.4",
+    "grunt-bumpup": "~0.2.0",
+    "grunt-testem": "~0.3.6",
+    "spatester": "0.0.1"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "author": {
+    "name": "Inativ",
+    "email": "inativ@viareport.com",
+    "url": "http://viareport.com"
+  }
+}
