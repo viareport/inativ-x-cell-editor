@@ -1,5 +1,6 @@
 (function(){
 
+    // --- Callbacks
     var clickCellListener = function(e) {
             var cell = e.target;
             while (cell.nodeName.toLowerCase() !== 'td') {
@@ -56,11 +57,16 @@
                 var datagridContent = this.parentNode;
                 this.datagrid = datagridContent.parentNode;
 
-                this.style.display = 'none';
+                this._editableColumns = [];
+                this._editors = [];
+                this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
+                    if (columnDefinition.editor) {
+                        this._editableColumns.push(columnIndex);
+                        this._editors[columnIndex] =  columnDefinition.editor();
+                    }
+                }.bind(this));
 
-                this.inputField = document.createElement('input');
-                this.inputField.setAttribute('type', 'text');
-                this.appendChild(this.inputField);
+                this.style.display = 'none';
 
                 datagridContent.querySelector('table').addEventListener('click', this.clickCellListener);
             },
@@ -80,7 +86,8 @@
                 var top = cell.offsetTop,
                     left = cell.offsetLeft,
                     height = cell.clientHeight,
-                    width = cell.clientWidth;
+                    width = cell.clientWidth,
+                    editor = this._editors[cell.cellIndex];
 
                 this.style.top = top + 'px';
                 this.style.left = left+ 'px';
@@ -90,8 +97,12 @@
 
                 this.cell = cell;
 
+                this.innerHTML = '';
+                editor.setValue(cell.cellValue);
+                this.appendChild(editor);
+/*
                 this.inputField.value = this.cell.cellValue;
-                this.inputField.select();
+                this.inputField.select();*/
 
                 document.addEventListener('keydown', this.keyListener, true);
                 document.addEventListener('click', this.clickoutsideListener, true);
@@ -102,7 +113,7 @@
 
                 document.removeEventListener('keydown', this.keyListener, true);
                 document.removeEventListener('click', this.clickoutsideListener, true);
-                this.inputField.setAttribute('value', '');
+               // this.inputField.setAttribute('value', '');
             },
             moveLeft: function moveLeft() {
                 var previousCell = this.cell.previousSibling || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
@@ -119,15 +130,18 @@
                 }
             },
             setValue: function setValue() {
-                var event = new CustomEvent('cellChanged', {
-                    'detail': {
-                        cell: this.cell,
-                        newValue: this.inputField.value
-                    },
-                    'bubbles': true,
-                    'cancelable': false
-                });
-                this.dispatchEvent(event);
+                var editorValue = this._editors[this.cell.cellIndex].getValue();
+                if (editorValue !== this.cell.cellValue) {
+                    var event = new CustomEvent('cellChanged', {
+                        'detail': {
+                            cell: this.cell,
+                            newValue: editorValue
+                        },
+                        'bubbles': true,
+                        'cancelable': false
+                    });
+                    this.dispatchEvent(event);
+                }
                 this.hide();
             }
         }
