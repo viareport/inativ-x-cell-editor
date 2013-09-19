@@ -4,6 +4,38 @@
     <head>
         <title>inativ-x-cell-editor Test</title>
         <link rel="stylesheet" type="text/css" href="../dist/inativ-x.css">
+        <link rel="stylesheet" type="text/css" href="/demo/webcomponents.css"/>
+        <style>
+            table {
+                border-collapse: collapse;
+            }
+
+            td, th {
+                border: 1px solid black;
+            }
+
+            x-table-column-input-filter input[type="text"] {
+                width: 90%;
+            }
+
+            body {
+                padding: 50px 0 0 20px;
+                /* TODO height 100% fonctionne pas pourquoi ? */
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                position: absolute;
+            }
+
+            x-cell-editor {
+                background-color: cyan;
+                position: absolute;
+                display: inline-block;
+                min-width: 150px;
+                min-height: 18px;
+            }
+        </style>
     </head>
 
     <body>
