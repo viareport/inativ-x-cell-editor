@@ -7,8 +7,7 @@
     "url": "git://github.com:viareport/inativ-x-cell-editor.git"
   },
   "main": "./dist/main.js",
-  "keywords": [
-  ],
+  "keywords": [],
   "devDependencies": {
     "bower": "0.7.0",
     "grunt": "~0.4.0",
@@ -21,7 +20,8 @@
     "grunt-browserify": "~1.2.4",
     "grunt-bumpup": "~0.2.0",
     "grunt-testem": "~0.3.6",
-    "spatester": "0.0.1"
+    "spatester": "0.0.1",
+    "grunt-contrib-concat": "~0.3.0"
   },
   "engines": {
     "node": ">=0.4.0"
@@ -30,5 +30,8 @@
     "name": "Inativ",
     "email": "inativ@viareport.com",
     "url": "http://viareport.com"
+  },
+  "dependencies": {
+    "inativ-x-datagrid": "~0.1.15"
   }
 }

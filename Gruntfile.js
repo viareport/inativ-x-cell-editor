@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compass');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -21,6 +22,14 @@ module.exports = function(grunt) {
                 options: {
                     config: 'assets/compass_config.rb'
                 }
+            }
+        },
+        concat: {
+            webcomponents_css: {
+                src: [
+                    './dist/*.css'
+                ],
+                dest: 'demo/webcomponents.css'
             }
         },
         connect: {
@@ -43,7 +52,7 @@ module.exports = function(grunt) {
             all: ['Gruntfile.js', 'src/main.js']
         },
         watch: {
-            files: ['src/*.js', 'src/*.scss', 'test/test.js'],
+            files: ['src/*.js', 'src/*.scss', 'test/test.js', 'node_modules/**/src/*.js', 'node_modules/**/src/*.scss'],
             tasks: ['build'],
             options: {
                 spawn: false
@@ -85,7 +94,7 @@ module.exports = function(grunt) {
         grunt.log.writeln("----------");
     });
 
-    grunt.registerTask('build', ['clean', 'browserify', 'jshint', 'compass', 'copy']);
+    grunt.registerTask('build', ['clean', 'browserify', 'jshint', 'compass', 'concat', 'copy']);
     grunt.registerTask('demo', ['build', 'launchDemo']);
     grunt.registerTask('test', ['build', 'testem']);
     grunt.registerTask('dist', ['test', 'bumpup']);
