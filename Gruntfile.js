@@ -27,7 +27,7 @@ module.exports = function(grunt) {
         concat: {
             webcomponents_css: {
                 src: [
-                    './dist/*.css'
+                    './node_modules/**/dist/*.css'
                 ],
                 dest: 'demo/webcomponents.css'
             }
