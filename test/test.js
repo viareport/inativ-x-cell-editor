@@ -98,8 +98,9 @@ testSuite.addTest("Comportement du click outside", function (scenario, asserter)
     }, 'Le cell editor doit apparaître');
 
     var expectedValue = "toto";
-    scenario.fill('x-cell-editor input', expectedValue)
-        .click("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+    scenario.exec(function() {
+        document.querySelector('x-cell-editor input').value = expectedValue;
+    }).click("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
 
     asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
         'La valeur saisie doit se retrouver dans la cellule');
