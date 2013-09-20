@@ -1,4 +1,39 @@
 require('inativ-x-datagrid');
+//TODO Faire un npm
+(function () {
+    function doesSupportCustomEventConstructor() {
+        try {
+//            var test = new CustomEvent();
+//            if (!test) {
+//                return false;
+//            }else
+            if (new Event('submit', { bubbles: false }).bubbles !== false) {
+                return false;
+            } else if (new Event('submit', { bubbles: true }).bubbles !== true) {
+                return false;
+            } else if (new Event('submit', { detail: 'toto'}).detail !== 'toto') {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (e) {
+            return false;
+        }
+    }
+
+    if (!doesSupportCustomEventConstructor()) {
+        window.CustomEvent = function CustomEvent(event, params) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent('CustomEvent');
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+        };
+
+        window.CustomEvent.prototype = window.CustomEvent.prototype;
+    }
+
+})();
+
 (function(){
 
     // --- Callbacks
@@ -55,6 +90,8 @@ require('inativ-x-datagrid');
                 this.keyListener = inputKeyListener.bind(this);
                 this.clickoutsideListener = clickoutsideListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
+                this.cell = null;
+                this.cellDomIndex = null;
             },
             inserted: function inserted() {
                 var cellEditor = this;
@@ -91,13 +128,12 @@ require('inativ-x-datagrid');
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
-                this.cellIndex = cell.cellIndex + 1;
+                this.cell = cell;
+                this.cellDomIndex = cell.cellIndex + 1;
                 this.style.top = top + 'px';
                 this.style.height = height + 'px';
                 this.style.display = 'inline-block';
                 this.calculateWidthAndLeft();
-
-                this.cell = cell;
 
                 this.innerHTML = '';
                 editor.affectValue(cell.cellValue);
@@ -153,7 +189,7 @@ require('inativ-x-datagrid');
                 this.hide();
             },
             calculateWidthAndLeft: function calculateWidthAndLeft() {
-                var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellIndex);
+                var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellDomIndex);
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
                 this.style.width = columnHeaderCell.clientWidth + 'px';
             }

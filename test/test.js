@@ -13,6 +13,18 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
         document.querySelector('body').appendChild(datagrid);
         datagrid.registerPlugin(cellEditor);
 
+        var datagridContent = [
+            [
+                {value: "A1"},
+                {value: "B1"},
+                {value: "C1"}
+            ],
+            [
+                {value: "A2"},
+                {value: "B2"},
+                {value: "C2"}
+            ]
+        ];
         datagrid.data = {
             colHeader: [
                 [
@@ -31,23 +43,20 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
                     {value: 'column3'}
                 ]
             ],
-            content: [
-                [
-                    {value: "A1"},
-                    {value: "B1"},
-                    {value: "C1"}
-                ],
-                [
-                    {value: "A2"},
-                    {value: "B2"},
-                    {value: "C2"}
-                ]
-            ]
+            content: datagridContent
         };
+
+        datagrid.addEventListener('cellChanged', function (e) {
+            var cell = e.detail.cell;
+            datagridContent[cell.cellRow][cell.cellIndex].value = e.detail.newValue;
+            datagrid.content = datagridContent;
+        });
     },
 
     tearDown: function () {
         var datagrid = document.querySelector('x-datagrid');
+        // TODO problème ie9
+        //datagrid.removeEventListener('cellChanged');
         document.body.removeChild(datagrid);
     }
 });
@@ -83,11 +92,17 @@ testSuite.addTest("On ne peut n'avoir qu'une cellule en édition", function (sce
 testSuite.addTest("Comportement du click outside", function (scenario, asserter) {
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+
     asserter.assertTrue(function () {
         return cellEditor.style.display !== 'none';
     }, 'Le cell editor doit apparaître');
 
-    scenario.click("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+    var expectedValue = "toto";
+    scenario.fill('x-cell-editor input', expectedValue)
+        .click("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+
+    asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
+        'La valeur saisie doit se retrouver dans la cellule');
 
     asserter.assertTrue(function () {
         return cellEditor.style.display === 'none';
