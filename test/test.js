@@ -12,7 +12,6 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
 
         document.querySelector('body').appendChild(datagrid);
         datagrid.registerPlugin(cellEditor);
-
         var datagridContent = [
             [
                 {value: "A1"},
@@ -39,7 +38,17 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
                         };
                         return input;
                     }},
-                    {value: 'column2'},
+                    {value: 'column2', editor: function () {
+                        var input = document.createElement('input');
+                        input.setAttribute('type', 'text');
+                        input.affectValue = function (value) {
+                            this.value = value;
+                        };
+                        input.getValue = function () {
+                            return this.value;
+                        };
+                        return input;
+                    }},
                     {value: 'column3'}
                 ]
             ],
@@ -111,15 +120,65 @@ testSuite.addTest("Comportement du click outside", function (scenario, asserter)
 });
 
 testSuite.addTest("Comportement de la touche escape", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
 
+        var unExpectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = unExpectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 'Esc',  27);
+
+        asserter.assertNodeNotContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", unExpectedValue,
+            'La valeur saisie ne doit pas être conservé après échappement');
+
+        asserter.assertTrue(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit disparaître');
+    }
 });
 
 testSuite.addTest("Comportement de la touche entrée", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
 
+        var expectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = expectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 'Enter',  13);
+
+        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
+            'La valeur saisie doit être ' + expectedValue );
+
+        asserter.assertTrue(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit disparaître');
+    }
 });
 
-testSuite.addTest("Comportement des touches de navigation", function (scenario, asserter) {
-    //TODO A faire
+testSuite.addTest("Comportement de la touche tabulation", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+
+        var expectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = expectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 9,  9); // et hop, on tabule et on part à droite
+
+        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
+            'La valeur saisie doit être ' + expectedValue );
+
+        asserter.assertFalse(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit être présent');
+
+//        asserter.assertTrue(function () {
+//            var editedCellAfterRightArrow = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)");
+//            return cellEditor.style.left === editedCellAfterRightArrow.offsetLeft+"px" && cellEditor.style.top === editedCellAfterRightArrow.offsetTop+"px";
+//        }, 'Le cell editor doit se superposer à la cellule suivante');
+    }
 });
 
 document.addEventListener('DOMComponentsLoaded', function(){
