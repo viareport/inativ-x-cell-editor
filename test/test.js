@@ -181,6 +181,54 @@ testSuite.addTest("Comportement de la touche tabulation", function (scenario, as
     }
 });
 
+testSuite.addTest("Comportement de la touche tabulation : apres modif sur une cellule, puis tab, l'input est sur la cellule suivante", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+
+        var expectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = expectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 9,  9); // et hop, on tabule et on part à droite
+
+        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)", expectedValue,
+            'La valeur saisie doit être ' + expectedValue );
+
+        asserter.assertFalse(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit être présent');
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a tabulé');
+    }
+});
+
+testSuite.addTest("Comportement de la touche shift+tabulation : apres modif sur une cellule, puis tab, l'input est sur la cellule précédente", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+
+        var expectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = expectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 9,  9, true); // et hop, on tabule et on part à gauche
+
+        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)", expectedValue,
+            'La valeur saisie doit être ' + expectedValue );
+
+        asserter.assertFalse(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit être présent');
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a tabulé');
+    }
+});
+
 document.addEventListener('DOMComponentsLoaded', function(){
     testSuite.run();
 });

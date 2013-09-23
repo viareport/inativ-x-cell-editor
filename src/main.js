@@ -63,6 +63,7 @@ require('inativ-x-datagrid');
                         e.stopPropagation();
                         this.affectValue();
                         if (e.shiftKey) {
+
                             this.moveLeft();
                         }
                         else {
@@ -180,16 +181,18 @@ require('inativ-x-datagrid');
                 // this.inputField.setAttribute('value', '');
             },
             moveLeft: function moveLeft() {
-                var previousCell = this.cell.previousSibling || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
+                var previousCell = this.cell.previousSibling;// || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
                 if (previousCell) {
                     this.hide();
+                    previousCell = this.datagrid.getCellAt((previousCell.cellIndex), (previousCell.cellRow));
                     this.edit(previousCell);
                 }
             },
-            moveRight: function moveRight(e) {
-                var nextCell = this.cell.nextSibling || (this.cell.parentNode.nextSibling && this.cell.parentNode.nextSibling.childNodes[0]);
+            moveRight: function moveRight() {
+                var nextCell = this.cell.nextSibling;// || (this.cell.parentNode.nextSibling && this.cell.parentNode.nextSibling.childNodes[0]);
                 if (nextCell) {
                     this.hide();
+                    nextCell = this.datagrid.getCellAt((nextCell.cellIndex),(nextCell.cellRow));
                     this.edit(nextCell);
                 }
             },
