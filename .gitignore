@@ -3,6 +3,8 @@ demo/main.js
 dist/*
 node_modules/
 test/testbuild.js
+test/main.*
+test/x-tag-core.js
+demo/main.*
 test-result/testem-ci.tap
-*.tgz
 testem*.json

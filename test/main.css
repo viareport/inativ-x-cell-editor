@@ -1,0 +1,86 @@
+.x-datagrid-cell {
+  height: 20px;
+  padding: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.cell-header {
+  height: 40px;
+}
+
+.column-header {
+  white-space: normal;
+  vertical-align: middle;
+  padding: 2px;
+  width: 150px;
+}
+
+.row-header.cell {
+  width: 250px;
+}
+
+x-datagrid {
+  height: 100%;
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 100%;
+}
+x-datagrid table {
+  width: 100%;
+}
+
+.contentWrapper {
+  overflow-x: hidden;
+  position: relative;
+}
+.contentWrapper table {
+  overflow-y: auto;
+  width: 100%;
+  border: 1px solid #e1e1e1;
+  table-layout: fixed;
+}
+
+.columnHeaderWrapper {
+  background: #fdfdfd;
+}
+.columnHeaderWrapper .form-input input {
+  line-height: normal;
+}
+.columnHeaderWrapper table {
+  table-layout: fixed;
+}
+.columnHeaderWrapper .overflow-display, .columnHeaderWrapper .overflow-display * {
+  overflow: visible;
+}
+.columnHeaderWrapper th {
+  padding-bottom: 5px;
+}
+
+.x-datagrid-tr:hover .import-action:hover {
+  cursor: pointer;
+}
+
+.no-border-right {
+  border-right: 1px solid transparent;
+}
+
+.no-border-left {
+  border-left: 1px solid transparent;
+}
+
+.no-border-bottom {
+  border-bottom: 1px solid transparent;
+}
+
+.no-border-top {
+  border-top: 1px solid transparent;
+}
+
+.overflow-display {
+  overflow: visible;
+}
+

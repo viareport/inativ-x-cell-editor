@@ -88,7 +88,7 @@ testSuite.addTest("Affichage de l'edition sur un double click", function(scenari
     }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
 });
 
-testSuite.addTest("On ne peut n'avoir qu'une cellule en édition", function (scenario, asserter) {
+testSuite.addTest("On ne peut avoir qu'une cellule en édition", function (scenario, asserter) {
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)")
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");

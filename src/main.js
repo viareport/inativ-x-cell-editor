@@ -143,6 +143,9 @@ require('inativ-x-datagrid');
         },
         methods: {
             edit: function edit(cell) {
+                if(!this._editors[cell.cellIndex]) {
+                    return;
+                }
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
