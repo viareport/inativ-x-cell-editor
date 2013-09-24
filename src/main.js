@@ -143,9 +143,6 @@ require('inativ-x-datagrid');
         },
         methods: {
             edit: function edit(cell) {
-                if(!this._editors[cell.cellIndex]) {
-                    return;
-                }
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
@@ -184,26 +181,27 @@ require('inativ-x-datagrid');
                 // this.inputField.setAttribute('value', '');
             },
             moveLeft: function moveLeft() {
-                var previousCell = this.cell.previousSibling;// || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
-                if (previousCell) {
-                    this.hide();
-                    previousCell = this.datagrid.getCellAt((previousCell.cellIndex), (previousCell.cellRow));
-                    this.edit(previousCell);
-                }
+                // || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
+                this.moveTo(this.cell.previousSibling);
             },
             moveRight: function moveRight() {
-                var nextCell = this.cell.nextSibling;// || (this.cell.parentNode.nextSibling && this.cell.parentNode.nextSibling.childNodes[0]);
-                if (nextCell) {
+                // || (this.cell.parentNode.nextSibling && this.cell.parentNode.nextSibling.childNodes[0]);
+                this.moveTo(this.cell.nextSibling);
+            },
+
+            moveTo: function moveTo(cell) {
+                if (cell && this._editors[cell.cellIndex]) {
                     this.hide();
-                    nextCell = this.datagrid.getCellAt((nextCell.cellIndex),(nextCell.cellRow));
-                    this.edit(nextCell);
+                    cell = this.datagrid.getCellAt((cell.cellIndex),(cell.cellRow));
+                    this.edit(cell);
                 }
             },
+
             affectValue: function affectValue() {
                 var editorValue = this._editors[this.cell.cellIndex].getValue();
                 if (editorValue !== this.cell.cellValue) {
                     var event = new CustomEvent('cellChanged', {
-                        'detail': {
+                        'detail': { 
                             cell: this.cell,
                             newValue: editorValue
                         },

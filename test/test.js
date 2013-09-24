@@ -229,6 +229,25 @@ testSuite.addTest("Comportement de la touche shift+tabulation : apres modif sur 
     }
 });
 
+
+testSuite.addTest("Comportement de la touche tabulation : tab sur la dernière cellule éditable de la ligne, l'input reste sur la cellule courante", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+
+        scenario.keyboard('x-cell-editor', 'keydown', 9,  9); // et hop, on tabule et on part pas à droite
+
+        asserter.assertFalse(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit être présent');
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a tabulé');
+    }
+});
+
 document.addEventListener('DOMComponentsLoaded', function(){
     testSuite.run();
 });
