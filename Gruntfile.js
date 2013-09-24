@@ -52,16 +52,9 @@ module.exports = function(grunt) {
             }
         },
         copy: {
-            demo: {
+            dist: {
                 files: [
-                    {src: ['dist/main.js'], dest: 'demo/main.js'},
-                    {src: ['lib/x-tag-core.js'], dest: 'demo/x-tag-core.js'},
-                ]
-            },
-            test: {
-                files: [
-                    {src: ['dist/main.js'], dest: 'test/main.js'},
-                    {src: ['lib/x-tag-core.js'], dest: 'test/x-tag-core.js'},
+                    {src : ['src/main.js'], dest: 'dist/main.js'},
                 ]
             }
         },
@@ -78,8 +71,12 @@ module.exports = function(grunt) {
                 tasks: ['dev']
             },
             test: {
-                files: ['src/*.js', 'src/*.scss', 'test/test.js'],
+                files: ['src/*.js', 'src/*.scss', 'test/test.js', 'test/TestemSuite.html'],
                 tasks: ['test']
+            },
+            demo: {
+                files: ['src/*.js', 'src/*.scss', 'demo/index.html'],
+                tasks: ['demo']
             },
             options: {
                 spawn: false
@@ -88,12 +85,12 @@ module.exports = function(grunt) {
         browserify: {
             test: {
                 files: {
-                    'test/testbuild.js': ['test/test.js']
+                    'test/main.js': ['lib/x-tag-core.js', 'src/main.js', 'test/test.js']
                 }
             },
-            build: {
+            demo: {
                 files: {
-                    'dist/main.js': ['src/main.js']
+                    'demo/main.js': ['lib/x-tag-core.js', 'src/main.js']
                 }
             }
         },
@@ -136,10 +133,10 @@ module.exports = function(grunt) {
         grunt.log.writeln("----------");
     });
 
-    grunt.registerTask('build', ['clean:build', 'jshint', 'browserify:build', 'compass']);
-    grunt.registerTask('demo', ['build', 'clean:demo', 'concat:demo', 'copy:demo', 'launchDemo']);
-    grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'copy:test', 'browserify:test', 'testem']);
-    grunt.registerTask('dist', ['test', 'bumpup']);
+    grunt.registerTask('build', ['clean:build', 'jshint', 'compass']);
+    grunt.registerTask('demo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo', 'launchDemo']);
+    grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'testem']);
+    grunt.registerTask('dist', ['test', 'copy:dist', 'bumpup']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
     grunt.registerTask('default', ['build', 'watch:build']);
