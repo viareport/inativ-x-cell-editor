@@ -133,10 +133,10 @@ module.exports = function(grunt) {
         grunt.log.writeln("----------");
     });
 
-    grunt.registerTask('build', ['clean:build', 'jshint', 'compass']);
+    grunt.registerTask('build', ['clean:build', 'jshint', 'compass', 'copy:dist']);
     grunt.registerTask('demo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo', 'launchDemo']);
     grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'testem']);
-    grunt.registerTask('dist', ['test', 'copy:dist', 'bumpup']);
+    grunt.registerTask('dist', ['test', 'bumpup']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
     grunt.registerTask('default', ['build', 'watch:build']);
