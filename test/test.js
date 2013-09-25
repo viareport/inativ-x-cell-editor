@@ -88,6 +88,15 @@ testSuite.addTest("Affichage de l'edition sur un double click", function(scenari
     }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
 });
 
+testSuite.addTest("un double click sur une cellule non éditable ne fait rien", function(scenario, asserter) {
+    scenario.wait('x-cell-editor')
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)");
+
+    asserter.assertFalse(function() {
+        return cellEditor.style.display !== 'none';
+    }, 'On ne doit pas avoir un cell editor visible');
+});
+
 testSuite.addTest("On ne peut avoir qu'une cellule en édition", function (scenario, asserter) {
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)")
@@ -173,11 +182,63 @@ testSuite.addTest("Comportement de la touche tabulation", function (scenario, as
         asserter.assertFalse(function () {
             return cellEditor.style.display === 'none';
         }, 'Le cell editor doit être présent');
+    }
+});
 
-//        asserter.assertTrue(function () {
-//            var editedCellAfterRightArrow = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)");
-//            return cellEditor.style.left === editedCellAfterRightArrow.offsetLeft+"px" && cellEditor.style.top === editedCellAfterRightArrow.offsetTop+"px";
-//        }, 'Le cell editor doit se superposer à la cellule suivante');
+testSuite.addTest("Comportement de la touche flèche droite", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
+
+        scenario.keyboard('x-cell-editor', 'keydown', 39,  39); // et hop, on part en haut
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule de droite');
+    }
+});
+
+testSuite.addTest("Comportement de la touche flèche haut", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
+
+        scenario.keyboard('x-cell-editor', 'keydown', 38,  38); // et hop, on part en haut
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule du dessus');
+    }
+});
+
+testSuite.addTest("Comportement de la touche flèche bas", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
+
+        scenario.keyboard('x-cell-editor', 'keydown', 40,  40); // et hop, on part en bas
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule du dessus');
     }
 });
 
@@ -205,7 +266,7 @@ testSuite.addTest("Comportement de la touche tabulation : apres modif sur une ce
     }
 });
 
-testSuite.addTest("Comportement de la touche shift+tabulation : apres modif sur une cellule, puis tab, l'input est sur la cellule précédente", function (scenario, asserter) {
+testSuite.addTest("Comportement de la touche shift+tabulation : apres modif sur une cellule, puis shift+tab, l'input est sur la cellule précédente", function (scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         scenario.wait('x-cell-editor')
             .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
@@ -214,6 +275,30 @@ testSuite.addTest("Comportement de la touche shift+tabulation : apres modif sur 
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = expectedValue;
         }).keyboard('x-cell-editor', 'keydown', 9,  9, true); // et hop, on tabule et on part à gauche
+
+        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)", expectedValue,
+            'La valeur saisie doit être ' + expectedValue );
+
+        asserter.assertFalse(function () {
+            return cellEditor.style.display === 'none';
+        }, 'Le cell editor doit être présent');
+
+        asserter.assertTrue(function () {
+            var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+            return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+        }, 'Le cell editor doit se superposer à la cellule sur laquelle on a tabulé');
+    }
+});
+
+testSuite.addTest("Comportement de la touche flèche gauche : apres modif sur une cellule, puis flèche gauche, l'input est sur la cellule précédente", function (scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        scenario.wait('x-cell-editor')
+            .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+
+        var expectedValue = "toto";
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = expectedValue;
+        }).keyboard('x-cell-editor', 'keydown', 37,  37, true); // et hop, on part à gauche
 
         asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)", expectedValue,
             'La valeur saisie doit être ' + expectedValue );

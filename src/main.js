@@ -1,12 +1,7 @@
 require('inativ-x-datagrid');
-//TODO Faire un npm
 (function () {
     function doesSupportCustomEventConstructor() {
         try {
-//            var test = new CustomEvent();
-//            if (!test) {
-//                return false;
-//            }else
             if (new Event('submit', { bubbles: false }).bubbles !== false) {
                 return false;
             } else if (new Event('submit', { bubbles: true }).bubbles !== true) {
@@ -19,6 +14,7 @@ require('inativ-x-datagrid');
         } catch (e) {
             return false;
         }
+
     }
 
     if (!doesSupportCustomEventConstructor()) {
@@ -31,7 +27,6 @@ require('inativ-x-datagrid');
 
         window.CustomEvent.prototype = window.CustomEvent.prototype;
     }
-
 })();
 
 (function () {
@@ -39,7 +34,6 @@ require('inativ-x-datagrid');
     // --- Callbacks
     var clickCellListener = function (e) {
 
-            //TODO Rajouter test pour filtrer les colonnes non éditables
             var cell = e.target;
             while (cell.nodeName.toLowerCase() !== 'td') {
                 cell = cell.parentNode;
@@ -71,22 +65,34 @@ require('inativ-x-datagrid');
                         }
                     }
                     break;
-//                case 39: //right arrow
-//                    e.preventDefault();
-//                    e.stopPropagation();
-//                    this.affectValue();
-//                    this.moveRight();
-//                    break;
-//                case 37: //right arrow
-//                    e.preventDefault();
-//                    e.stopPropagation();
-//                    this.affectValue();
-//                    this.moveLeft();
-//                    break;
+
+                case 37: // LEFT
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.affectValue();
+                    this.moveLeft();
+                    break;
+                case 38: // UP
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.affectValue();
+                    this.moveUp();
+                    break;
+                case 39: // right
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.affectValue();
+                    this.moveRight();
+                    break;
+                case 40: // down
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.affectValue();
+                    this.moveDown();
+                    break;
             }
         },
         clickoutsideListener = function (e) {
-            // console.log("click outside");
             var elt = e.target;
             while (elt) {
                 if (elt === this || elt === this.cell) {
@@ -108,6 +114,7 @@ require('inativ-x-datagrid');
                 this.cell = null;
                 this.cellDomIndex = null;
             },
+
             inserted: function inserted() {
                 var cellEditor = this;
                 this._editableColumns = [];
@@ -141,8 +148,14 @@ require('inativ-x-datagrid');
         },
         accessors: {
         },
+
         methods: {
             edit: function edit(cell) {
+
+                if(!this._isColumnEditable(cell.cellIndex)) {
+                    return;
+                }
+
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
@@ -181,18 +194,25 @@ require('inativ-x-datagrid');
                 // this.inputField.setAttribute('value', '');
             },
             moveLeft: function moveLeft() {
-                // || (this.cell.parentNode.previousSibling && this.cell.parentNode.previousSibling.childNodes[this.cell.parentNode.previousSibling.childNodes.length - 1]);
-                this.moveTo(this.cell.previousSibling);
+                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex-1),(this.cell.cellRow));
+                this._moveTo(nextCell);
             },
             moveRight: function moveRight() {
-                // || (this.cell.parentNode.nextSibling && this.cell.parentNode.nextSibling.childNodes[0]);
-                this.moveTo(this.cell.nextSibling);
+                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex+1),(this.cell.cellRow));
+                this._moveTo(nextCell);
+            },
+            moveUp: function moveRight() {
+                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex),(this.cell.cellRow-1));
+                this._moveTo(nextCell);
+            },
+            moveDown: function moveRight() {
+                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex),(this.cell.cellRow+1));
+                this._moveTo(nextCell);
             },
 
-            moveTo: function moveTo(cell) {
-                if (cell && this._editors[cell.cellIndex]) {
+            _moveTo: function moveTo(cell) {
+                if (cell && this._isColumnEditable(cell.cellIndex)) {
                     this.hide();
-                    cell = this.datagrid.getCellAt((cell.cellIndex),(cell.cellRow));
                     this.edit(cell);
                 }
             },
@@ -216,6 +236,10 @@ require('inativ-x-datagrid');
                 var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellDomIndex);
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
                 this.style.width = columnHeaderCell.clientWidth + 'px';
+            },
+
+            _isColumnEditable: function _isColumnEditable(columnIndex) {
+                return this._editors[columnIndex];
             }
         }
     });

@@ -76,7 +76,7 @@ module.exports = function(grunt) {
             },
             demo: {
                 files: ['src/*.js', 'src/*.scss', 'demo/index.html'],
-                tasks: ['demo']
+                tasks: ['builddemo']
             },
             options: {
                 spawn: false
@@ -134,7 +134,8 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('build', ['clean:build', 'jshint', 'compass', 'copy:dist']);
-    grunt.registerTask('demo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo', 'launchDemo']);
+    grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo']);
+    grunt.registerTask('demo', ['builddemo', 'launchDemo']);
     grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'testem']);
     grunt.registerTask('dist', ['test', 'bumpup']);
 
