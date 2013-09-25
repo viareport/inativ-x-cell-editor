@@ -39,8 +39,7 @@
 </head>
 
 <body>
-<x-datagrid cell-height="20" cell-width="150">
-</x-datagrid>
+    <x-datagrid cell-height="20" cell-width="150"></x-datagrid>
 </body>
 
 <script type="text/javascript" src="/demo/main.js"></script>
@@ -56,24 +55,24 @@
                 {value: "C" + index},
                 {value: "D" + index},
                 {value: "E" + index}
-            ]);
+                ]);
         }
 
         datagrid.data = {
             colHeader: [
-                [
-                    {value: 'column1', filter: true},
-                    {value: 'column2', editor: function() {
-                        var input = document.createElement('input');
-                        input.setAttribute('type', 'text');
-                        input.affectValue = function (value) {
-                            this.value = value;
-                        };
-                        input.getValue = function() {
-                            return this.value;
-                        };
-                        return input;
-                    }},
+            [
+            {value: 'column1', filter: true},
+            {value: 'column2', editor: function() {
+                var input = document.createElement('input');
+                input.setAttribute('type', 'text');
+                input.affectValue = function (value) {
+                    this.value = value;
+                };
+                input.getValue = function() {
+                    return this.value;
+                };
+                return input;
+            }},
                     //TODO proposer d'autre input ex:select
                     {value: 'column3', editor: function () {
                         var input = document.createElement('input');
@@ -88,18 +87,18 @@
                     }},
                     {value: 'column4'},
                     {value: 'column5'}
-                ]
-            ],
-            content: content
-        };
-        var editor = document.createElement('x-cell-editor');
-        datagrid.registerPlugin(editor);
-        datagrid.addEventListener('cellChanged', function(e) {
-            var cell = e.detail.cell;
-            content[cell.cellRow][cell.cellIndex].value = e.detail.newValue;
-            datagrid.content = content;
-        });
-    }, false);
+                    ]
+                    ],
+                    content: content
+                };
+                var editor = document.createElement('x-cell-editor');
+                datagrid.registerPlugin(editor);
+                datagrid.addEventListener('cellChanged', function(e) {
+                    var cell = e.detail.cell;
+                    content[cell.cellRow][cell.cellIndex].value = e.detail.newValue;
+                    datagrid.content = content;
+                });
+            }, false);
 
 </script>
 

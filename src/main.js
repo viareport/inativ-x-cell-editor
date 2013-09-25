@@ -51,45 +51,45 @@ require('inativ-x-datagrid');
                     this.affectValue();
                     this.hide();
                     break;
-                case 9: // TAB
-                    if (!e.ctrlKey && !e.altKey) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        this.affectValue();
-                        if (e.shiftKey) {
+                // case 9: // TAB
+                //     if (!e.ctrlKey && !e.altKey) {
+                //         e.preventDefault();
+                //         e.stopPropagation();
+                //         this.affectValue();
+                //         if (e.shiftKey) {
 
-                            this.moveLeft();
-                        }
-                        else {
-                            this.moveRight();
-                        }
-                    }
-                    break;
+                //             this.moveLeft();
+                //         }
+                //         else {
+                //             this.moveRight();
+                //         }
+                //     }
+                //     break;
 
-                case 37: // LEFT
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.affectValue();
-                    this.moveLeft();
-                    break;
-                case 38: // UP
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.affectValue();
-                    this.moveUp();
-                    break;
-                case 39: // right
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.affectValue();
-                    this.moveRight();
-                    break;
-                case 40: // down
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.affectValue();
-                    this.moveDown();
-                    break;
+                // case 37: // LEFT
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     this.affectValue();
+                //     this.moveLeft();
+                //     break;
+                // case 38: // UP
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     this.affectValue();
+                //     this.moveUp();
+                //     break;
+                // case 39: // right
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     this.affectValue();
+                //     this.moveRight();
+                //     break;
+                // case 40: // down
+                //     e.preventDefault();
+                //     e.stopPropagation();
+                //     this.affectValue();
+                //     this.moveDown();
+                //     break;
             }
         },
         clickoutsideListener = function (e) {
@@ -175,7 +175,7 @@ require('inativ-x-datagrid');
                  this.inputField.select();*/
 
                 //TODO A déplacer dans bloc 'events'
-                document.addEventListener('keydown', this.keyListener, true);
+                document.addEventListener('keyup', this.keyListener, false);
                 document.addEventListener('click', this.clickoutsideListener, true);
             },
             append: function append() {
@@ -189,7 +189,7 @@ require('inativ-x-datagrid');
                 this.cell = null;
 
                 //TODO A Priori inutile
-                document.removeEventListener('keydown', this.keyListener, true);
+                document.removeEventListener('keyup', this.keyListener, false);
                 document.removeEventListener('click', this.clickoutsideListener, true);
                 // this.inputField.setAttribute('value', '');
             },
@@ -235,7 +235,7 @@ require('inativ-x-datagrid');
             calculateWidthAndLeft: function calculateWidthAndLeft() {
                 var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellDomIndex);
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
-                this.style.width = columnHeaderCell.clientWidth + 'px';
+                // this.style.width = columnHeaderCell.clientWidth + 'px';
             },
 
             _isColumnEditable: function _isColumnEditable(columnIndex) {
