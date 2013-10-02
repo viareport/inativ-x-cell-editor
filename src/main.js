@@ -112,7 +112,7 @@ require('inativ-x-datagrid');
                 this.clickoutsideListener = clickoutsideListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
                 this.cell = null;
-                this.cellDomIndex = null;
+                this.cellDomIndex = 0;
             },
 
             inserted: function inserted() {
@@ -234,6 +234,9 @@ require('inativ-x-datagrid');
             },
             calculateWidthAndLeft: function calculateWidthAndLeft() {
                 var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellDomIndex);
+                if (!columnHeaderCell) {
+                    return;
+                }
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
                 // this.style.width = columnHeaderCell.clientWidth + 'px';
             },
