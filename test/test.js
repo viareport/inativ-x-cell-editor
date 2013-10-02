@@ -1,4 +1,4 @@
-var TestSuite = require('spatester').TestSuite;
+var TestSuite = require('spatester');
 var datagrid, cellEditor;
 
 var testSuite = new TestSuite("inativ-x-cell-editor test", {
@@ -70,99 +70,93 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
     }
 });
 
-Testem.useCustomAdapter(function(socket) {
-    testSuite.setSocket(socket);
-});
 
 testSuite.addTest("Affichage de l'edition sur un double click", function(scenario, asserter) {
+    // Given
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
 
-    asserter.assertTrue(function() {
-        return cellEditor.style.display !== 'none';
-    }, 'On doit avoir un cell editor visible');
-
-    asserter.assertTrue(function () {
+    // Then
+    asserter.expect('x-cell-editor').to.be.visible();
+    asserter.expect('x-datagrid').to.returnTrue(function() {
         var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
         return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-    }, 'Le cell editor doit se superposer à la cellule sur laquelle on a double-cliqué');
+    });
 });
 
 testSuite.addTest("un double click sur une cellule non éditable ne fait rien", function(scenario, asserter) {
+    // When
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)");
 
-    asserter.assertFalse(function() {
-        return cellEditor.style.display !== 'none';
-    }, 'On ne doit pas avoir un cell editor visible');
+    // Then
+    asserter.expect('x-cell-editor').to.be.hidden();
 });
 
 testSuite.addTest("On ne peut avoir qu'une cellule en édition", function (scenario, asserter) {
+    // When
     scenario.wait('x-cell-editor')
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)")
         .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
 
-    asserter.assertTrue(function () {
-        return asserter.count('x-cell-editor')() === 1;
-    }, 'On doit avoir un cell editor visible');
+    // Then
+    asserter.expect('x-cell-editor').to.have.nodeLength(1);
 });
 
 testSuite.addTest("Comportement du click outside", function (scenario, asserter) {
+    // Given
+    var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
     scenario.wait('x-cell-editor')
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
-
-    asserter.assertTrue(function () {
-        return cellEditor.style.display !== 'none';
-    }, 'Le cell editor doit apparaître');
-
+        .dblclick(cellSelector);
     var expectedValue = "toto";
+
+    asserter.expect('x-cell-editor').to.be.visible();
+
+    // When
     scenario.exec(function() {
         document.querySelector('x-cell-editor input').value = expectedValue;
-    }).click("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
+    }).click("x-datagrid");
 
-    asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
-        'La valeur saisie doit se retrouver dans la cellule');
-
-    asserter.assertTrue(function () {
-        return cellEditor.style.display === 'none';
-    }, 'Le cell editor ne doit plus apparaître');
+    // Then
+    asserter.expect(cellSelector).to.have.html(expectedValue);
+    asserter.expect('x-cell-editor').to.be.hidden();
 });
 
 testSuite.addTest("Comportement de la touche escape", function (scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
         scenario.wait('x-cell-editor')
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
-
+            .dblclick(cellSelector);
         var unExpectedValue = "toto";
+
+        // When
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = unExpectedValue;
         }).keyboard('x-cell-editor', 'keyup', 'Esc',  27);
 
-        asserter.assertNodeNotContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", unExpectedValue,
-            'La valeur saisie ne doit pas être conservé après échappement');
-
-        asserter.assertTrue(function () {
-            return cellEditor.style.display === 'none';
-        }, 'Le cell editor doit disparaître');
+        // Then
+        asserter.expect(cellSelector).not.to.have.value(unExpectedValue);
+        asserter.expect('x-cell-editor').to.be.hidden();
     }
 });
 
 testSuite.addTest("Comportement de la touche entrée", function (scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
-        scenario.wait('x-cell-editor')
-            .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
-
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
         var expectedValue = "toto";
+        scenario.wait('x-cell-editor')
+            .dblclick(cellSelector);
+
+        // When
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = expectedValue;
         }).keyboard('x-cell-editor', 'keyup', 'Enter',  13);
 
-        asserter.assertNodeContains("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)", expectedValue,
-            'La valeur saisie doit être ' + expectedValue );
-
-        asserter.assertTrue(function () {
-            return cellEditor.style.display === 'none';
-        }, 'Le cell editor doit disparaître');
+        // Then
+        asserter.expect(cellSelector).to.have.value(expectedValue);
+        asserter.expect('x-cell-editor').to.be.hidden();
     }
 });
 

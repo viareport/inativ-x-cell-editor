@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-mkdir');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-bumpup');
     grunt.loadNpmTasks('grunt-testem');
@@ -16,7 +17,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
             build: ['dist/*.js', 'dist/*.css'],
-            test: ['test/testbuild.js', 'test/main.*', 'test/x-tag-core.js', 'testem*json'],
+            test: ['test/testbuild.js', 'test/main.*', 'test/x-tag-core.js', 'testem*json', 'test-result/*'],
             demo: ['demo/*.js', 'demo/*.css']
         },
         compass: {
@@ -123,6 +124,13 @@ module.exports = function(grunt) {
                     'node_modules/inativ-x-datagrid': ['build']
                 }
             }
+        },
+        mkdir: {
+            'test-result': {
+                options: {
+                    create: ['test-result']
+                }
+            }
         }
     });
 
@@ -136,9 +144,9 @@ module.exports = function(grunt) {
     grunt.registerTask('build', ['clean:build', 'jshint', 'compass', 'copy:dist']);
     grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo']);
     grunt.registerTask('demo', ['builddemo', 'launchDemo']);
-    grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'testem']);
+    grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'mkdir:test-result', 'testem']);
     grunt.registerTask('dist', ['test', 'bumpup']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
-    grunt.registerTask('default', ['build', 'watch:build']);
+    grunt.registerTask('default', ['build', 'watch']);
 };
