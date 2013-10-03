@@ -156,6 +156,14 @@ require('inativ-x-datagrid');
                     return;
                 }
 
+                this.dispatchEvent(new CustomEvent('startEditing', {
+                    'detail': {
+                        cell: cell
+                    },
+                    'bubbles': true,
+                    'cancelable': false
+                }));
+
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
@@ -186,6 +194,15 @@ require('inativ-x-datagrid');
             },
             hide: function hide() {
                 this.style.display = 'none';
+
+                this.dispatchEvent(new CustomEvent('stopEditing', {
+                    'detail': {
+                        cell: this.cell
+                    },
+                    'bubbles': true,
+                    'cancelable': false
+                }));
+
                 this.cell = null;
 
                 //TODO A Priori inutile
