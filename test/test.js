@@ -219,6 +219,24 @@ testSuite.addTest("Le focus doit être conservé après un changement du content
 
 });
 
+testSuite.addTest("Un click en dehors du tableau doit enlever le focus", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    // When
+    scenario.click('body');
+
+    // Then
+    asserter.expect('[focus]').not.to.exist();
+});
+testSuite.addTest("Un click en dehors du contenu tableau doit enlever le focus", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    // When
+    scenario.click('x-datagrid .columnHeaderWrapper');
+
+    // Then
+    asserter.expect('[focus]').not.to.exist();
+});
 
 // testSuite.addTest("Comportement de la touche tabulation", function (scenario, asserter) {
 //     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
