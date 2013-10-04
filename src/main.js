@@ -112,6 +112,17 @@ require('inativ-x-datagrid');
             this.affectValue();
             this.hide();
             //  e.stopPropagation();
+        },
+        clickOustsideDatagrid = function(e) {
+            var elt = e.target;
+            while(elt) {
+                if (elt === this.datagrid) {
+                    return;
+                }
+                elt = elt.parentNode;
+            }
+
+            this.removeCellFocus();
         };
 
     xtag.register('x-cell-editor', {
@@ -121,6 +132,7 @@ require('inativ-x-datagrid');
                 this.clickoutsideListener = clickoutsideListener.bind(this);
                 this.dblClickCellListener = dblClickCellListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
+                this.clickOustsideDatagrid = clickOustsideDatagrid.bind(this);
                 this.cell = null;
                 this.cellDomIndex = 0;
                 this.cellWithFocus = null;
@@ -147,6 +159,7 @@ require('inativ-x-datagrid');
                 //TODO A déplacer dans bloc 'events'
                 this.datagrid.contentWrapper.addEventListener('click', this.clickCellListener);
                 this.datagrid.contentWrapper.addEventListener('dblclick', this.dblClickCellListener);
+                document.addEventListener('click', this.clickOustsideDatagrid);
             },
             removed: function removed() {
                 this.hide();
@@ -276,17 +289,20 @@ require('inativ-x-datagrid');
                 // this.style.width = columnHeaderCell.clientWidth + 'px';
             },
             focusCell: function focusCell(cell) {
-                this.removeCellFocus(this.datagrid.querySelector('[focus]'));
+                this.removeCellFocus();
                 this._focusCell(cell);
                 this.cellWithFocus = {
                     x: cell.cellIndex,
                     y: cell.cellRow
                 };
             },
-            removeCellFocus: function removeCellFocus(cell) {
-                if (cell) {
-                    cell.removeAttribute('focus');  
+            removeCellFocus: function removeCellFocus() {
+                var domCellWithFocus = this.datagrid.querySelector('[focus]');
+                if (domCellWithFocus && this.cellWithFocus) {
+                    domCellWithFocus.removeAttribute('focus');
                     this.cellWithFocus = null;
+                } else if (domCellWithFocus && !this.cellWithFocus) {
+                    throw new Error("No cell should have attribute focus if we haven't register it !");
                 }
             },
 
