@@ -72,8 +72,8 @@ module.exports = function(grunt) {
                 tasks: ['dev']
             },
             test: {
-                files: ['src/*.js', 'src/*.scss', 'test/test.js', 'test/TestemSuite.html'],
-                tasks: ['test']
+                files: ['src/*.js', 'src/*.scss', 'test/test.js', 'test/TestemSuite.html', 'node_modules/inativ-*/src/*.js', 'node_modules/inativ-*/src/*.scss'],
+                tasks: ['buildTest']
             },
             demo: {
                 files: ['src/*.js', 'src/*.scss', 'demo/index.html'],
@@ -86,12 +86,12 @@ module.exports = function(grunt) {
         browserify: {
             test: {
                 files: {
-                    'test/main.js': ['lib/x-tag-core.js', 'src/main.js', 'test/test.js']
+                    'test/main.js': ['src/main.js', 'test/test.js']
                 }
             },
             demo: {
                 files: {
-                    'demo/main.js': ['lib/x-tag-core.js', 'src/main.js']
+                    'demo/main.js': ['src/main.js']
                 }
             }
         },
@@ -141,12 +141,13 @@ module.exports = function(grunt) {
         grunt.log.writeln("----------");
     });
 
-    grunt.registerTask('build', ['clean:build', 'jshint', 'compass', 'copy:dist']);
+    grunt.registerTask('build', ['clean:build', 'compass', 'copy:dist']);
     grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo']);
     grunt.registerTask('demo', ['builddemo', 'launchDemo']);
-    grunt.registerTask('test', ['build', 'clean:test', 'concat:test', 'browserify:test', 'mkdir:test-result', 'testem']);
+    grunt.registerTask('test', ['buildTest', 'mkdir:test-result', 'testem']);
     grunt.registerTask('dist', ['test', 'bumpup']);
+    grunt.registerTask('buildTest', ['build', 'clean:test', 'concat:test', 'browserify:test']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
-    grunt.registerTask('default', ['build', 'watch']);
+    grunt.registerTask('default', ['buildTest', 'watch:test']);
 };

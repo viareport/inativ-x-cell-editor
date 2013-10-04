@@ -1,5 +1,17 @@
 var TestSuite = require('spatester');
 var datagrid, cellEditor;
+var datagridContent = [
+    [
+        {value: "A1"},
+        {value: "B1"},
+        {value: "C1"}
+    ],
+    [
+        {value: "A2"},
+        {value: "B2"},
+        {value: "C2"}
+    ]
+];
 
 var testSuite = new TestSuite("inativ-x-cell-editor test", {
     setUp: function () {
@@ -12,18 +24,6 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
 
         document.querySelector('body').appendChild(datagrid);
         datagrid.registerPlugin(cellEditor);
-        var datagridContent = [
-            [
-                {value: "A1"},
-                {value: "B1"},
-                {value: "C1"}
-            ],
-            [
-                {value: "A2"},
-                {value: "B2"},
-                {value: "C2"}
-            ]
-        ];
         datagrid.data = {
             colHeader: [
                 [
@@ -147,18 +147,59 @@ testSuite.addTest("Comportement de la touche entrée", function (scenario, asser
         var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
         var expectedValue = "toto";
         scenario.wait('x-cell-editor')
-            .dblclick(cellSelector);
+            .dblclick(cellSelector)
+            .exec(function() {
+                document.querySelector('x-cell-editor input').value = expectedValue;
+            });
 
         // When
-        scenario.exec(function() {
-            document.querySelector('x-cell-editor input').value = expectedValue;
-        }).keyboard('x-cell-editor', 'keyup', 'Enter',  13);
+        scenario.keyboard('x-cell-editor', 'keyup', 'Enter',  13);
 
         // Then
-        asserter.expect(cellSelector).to.have.value(expectedValue);
+        asserter.expect(cellSelector).to.have.html(expectedValue);
         asserter.expect('x-cell-editor').to.be.hidden();
     }
 });
+
+testSuite.addTest("La 1ère cellule éditable doit avoir le focus", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
+
+    asserter.expect(firstEditableCellSelector).to.have.attr('focus');
+});
+
+testSuite.addTest("Le click sur une cellule editable doit lui donner le focus", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    // Given
+    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
+    var otherEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
+
+    // When
+    scenario.click(otherEditableCellSelector);
+
+    // Then
+    asserter.expect(firstEditableCellSelector).to.not.have.attr('focus');
+    asserter.expect(otherEditableCellSelector).to.have.attr('focus');
+});
+
+testSuite.addTest("Le focus doit être conservé après un changement du content du datagrid", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    // Given
+    var cell = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
+
+    // When
+    scenario.exec(function() {
+        datagrid.content = datagridContent;
+    });
+
+    // Then
+    asserter.expect(cell).to.have.attr('focus');
+
+});
+
 
 // testSuite.addTest("Comportement de la touche tabulation", function (scenario, asserter) {
 //     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )

@@ -30,17 +30,24 @@ require('inativ-x-datagrid');
 })();
 
 (function () {
+    function getParentCell(node) {
+        var cell = node;
+        while (cell.nodeName.toLowerCase() !== 'td' && cell.parentNode) {
+            cell = cell.parentNode;
+        }
+        return cell;
+    }
 
     // --- Callbacks
     var clickCellListener = function (e) {
-
-            var cell = e.target;
-            while (cell.nodeName.toLowerCase() !== 'td') {
-                cell = cell.parentNode;
-            }
+            var cell = getParentCell(e.target);
             if (cell) {
                 this.edit(cell);
             }
+        },
+        cellClickListener = function(e) {
+            var cell = getParentCell(e.target);
+            this.focusCell(cell);
         },
         inputKeyListener = function (e) {
             switch (e.keyCode) {
@@ -111,16 +118,20 @@ require('inativ-x-datagrid');
                 this.keyListener = inputKeyListener.bind(this);
                 this.clickoutsideListener = clickoutsideListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
+                this.cellClickListener = cellClickListener.bind(this);
                 this.cell = null;
                 this.cellDomIndex = 0;
+                this.cellWithFocus = null;
             },
 
             inserted: function inserted() {
                 var cellEditor = this;
                 this._editableColumns = [];
                 this._editors = [];
+                var firstColumn = null;
                 this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
                     if (columnDefinition.editor) {
+                        firstColumn = Math.min(columnIndex, firstColumn);
                         this._editableColumns.push(columnIndex);
                         this._editors[columnIndex] = columnDefinition.editor();
                     }
@@ -128,7 +139,11 @@ require('inativ-x-datagrid');
 
                 this.style.display = 'none';
 
+                var firstEditableCell = this.datagrid.getCellAt(firstColumn, 0);
+                this.focusCell(firstEditableCell);
+
                 //TODO A déplacer dans bloc 'events'
+                this.datagrid.contentWrapper.addEventListener('click', this.cellClickListener);
                 this.datagrid.contentWrapper.addEventListener('dblclick', this.clickCellListener);
             },
             removed: function removed() {
@@ -178,6 +193,7 @@ require('inativ-x-datagrid');
                 editor.affectValue(cell.cellValue);
                 this.appendChild(editor);
                 editor.focus();
+
                 /*
                  this.inputField.value = this.cell.cellValue;
                  this.inputField.select();*/
@@ -256,6 +272,30 @@ require('inativ-x-datagrid');
                 }
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
                 // this.style.width = columnHeaderCell.clientWidth + 'px';
+            },
+            focusCell: function focusCell(cell) {
+                this.removeCellFocus(this.datagrid.querySelector('[focus]'));
+                this._focusCell(cell);
+                this.cellWithFocus = {
+                    x: cell.cellIndex,
+                    y: cell.cellRow
+                };
+            },
+            removeCellFocus: function removeCellFocus(cell) {
+                if (cell) {
+                    cell.removeAttribute('focus');  
+                    this.cellWithFocus = null;
+                }
+            },
+
+            onContentRendered: function onContentRendered() {
+                if(this.cellWithFocus) {
+                    this._focusCell(this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y));
+                }
+            },
+
+            _focusCell: function _focusCell(cell) {
+                cell.setAttribute('focus', 'focus');
             },
 
             _isColumnEditable: function _isColumnEditable(columnIndex) {
