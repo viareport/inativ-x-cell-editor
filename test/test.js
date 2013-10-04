@@ -258,6 +258,24 @@ testSuite.addTest("Quand on appuie sur F2, la cellule qui a le focus passe en mo
         asserter.expect('x-datagrid').to.returnTrue(assertCellEditorIsAboveCell(1, 2), "L'editeur doit être positionné sur la cellule en édition");
     }
 });
+
+testSuite.addTest("Quand on sort du mode édition, l'ancienne cellule reprend le focus", function(scenario, asserter) {
+     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
+        scenario.wait('x-cell-editor')
+            .dblclick(cellSelector);
+        var unExpectedValue = "toto";
+
+        // When
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = unExpectedValue;
+        }).keyboard('x-cell-editor', 'keyup', 'Esc',  27);
+
+        // Then
+        asserter.expect(cellSelector).to.have.attr('focus');
+    }
+});
 // testSuite.addTest("Comportement de la touche tabulation", function (scenario, asserter) {
 //     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
 //         scenario.wait('x-cell-editor')

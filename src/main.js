@@ -60,6 +60,8 @@ require('inativ-x-datagrid');
             switch (e.keyCode) {
                 case 27: // ESC
                     this.hide();
+                    this.cellWithFocus = this._oldCellWithFocus;
+                    this.focusCell(this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y));
                     break;
                 case 13: // ENTER
                     this.affectValue();
@@ -150,6 +152,7 @@ require('inativ-x-datagrid');
                 this.cell = null;
                 this.cellDomIndex = 0;
                 this.cellWithFocus = null;
+                this._oldCellWithFocus = null;
             },
 
             inserted: function inserted() {
@@ -201,6 +204,7 @@ require('inativ-x-datagrid');
                     return;
                 }
 
+                this._oldCellWithFocus = this.cellWithFocus;
                 this.removeCellFocus();
 
                 this.dispatchEvent(new CustomEvent('startEditing', {
