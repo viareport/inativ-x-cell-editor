@@ -1,19 +1,20 @@
 var TestSuite = require('spatester');
-var datagrid, cellEditor;
-var datagridContent = [
-    [
-        {value: "_1"},
-        {value: "A1"},
-        {value: "B1"},
-        {value: "C1"}
-    ],
-    [
-        {value: "_2"},
-        {value: "A2"},
-        {value: "B2"},
-        {value: "C2"}
-    ]
-];
+var datagrid, 
+    cellEditor,
+    datagridContent = [
+        [
+            {value: "_1"},
+            {value: "A1"},
+            {value: "B1"},
+            {value: "C1"}
+        ],
+        [
+            {value: "_2"},
+            {value: "A2"},
+            {value: "B2"},
+            {value: "C2"}
+        ]
+    ];
 
 var testSuite = new TestSuite("inativ-x-cell-editor test", {
     setUp: function () {
@@ -73,6 +74,12 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
     }
 });
 
+function assertCellEditorIsAboveCell(rowIndex, colIndex) {
+    return function() {
+        var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(" + rowIndex + ") td:nth-child(" + colIndex + ")");
+        return cellEditor.style.left === (editedCell.offsetLeft)+"px" && cellEditor.style.top === editedCell.offsetTop+"px";  
+    };
+}
 
 testSuite.addTest("Affichage de l'edition sur un double click", function(scenario, asserter) {
     // Given
@@ -82,10 +89,8 @@ testSuite.addTest("Affichage de l'edition sur un double click", function(scenari
 
     // Then
     asserter.expect('x-cell-editor').to.be.visible();
-    asserter.expect('x-datagrid').to.returnTrue(function() {
-        var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)");
-        return cellEditor.style.left === (editedCell.offsetLeft)+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-    }, "L'editeur doit être position sur la cellule en édition");
+    asserter.expect('[focus]').not.to.exist();
+    asserter.expect('x-datagrid').to.returnTrue(assertCellEditorIsAboveCell(1, 2), "L'editeur doit être positionné sur la cellule en édition");
 });
 
 testSuite.addTest("un double click sur une cellule non éditable ne fait rien", function(scenario, asserter) {
@@ -238,6 +243,21 @@ testSuite.addTest("Un click en dehors du contenu tableau doit enlever le focus",
     asserter.expect('[focus]').not.to.exist();
 });
 
+
+testSuite.addTest("Quand on appuie sur F2, la cellule qui a le focus passe en mode edition", function(scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()) {
+        scenario.wait('x-datagrid');
+        asserter.expect('[focus]').to.exist();
+
+        // When
+        scenario.keyboard('x-datagrid', 'keydown', 113, 113);
+
+        // Then
+        asserter.expect('[focus]').not.to.exist(); 
+        asserter.expect('x-cell-editor').to.be.visible();
+        asserter.expect('x-datagrid').to.returnTrue(assertCellEditorIsAboveCell(1, 2), "L'editeur doit être positionné sur la cellule en édition");
+    }
+});
 // testSuite.addTest("Comportement de la touche tabulation", function (scenario, asserter) {
 //     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
 //         scenario.wait('x-cell-editor')
