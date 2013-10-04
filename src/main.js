@@ -38,11 +38,6 @@ require('inativ-x-datagrid');
         return cell;
     }
 
-    var KEYCODE = {
-        "F2": 113,
-        "ENTRER": 13
-    }
-
     // --- Callbacks
     var dblClickCellListener = function (e) {
             var cell = getParentCell(e.target);
@@ -128,14 +123,6 @@ require('inativ-x-datagrid');
             }
 
             this.removeCellFocus();
-        },
-        keypressListener = function(e) {
-            if (KEYCODE.F2 === e.keyCode) {
-                var cell = this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y);
-                if (cell) {
-                    this.edit(cell);
-                }
-            }
         };
 
     xtag.register('x-cell-editor', {
@@ -146,7 +133,6 @@ require('inativ-x-datagrid');
                 this.dblClickCellListener = dblClickCellListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
                 this.clickOustsideDatagrid = clickOustsideDatagrid.bind(this);
-                this.keypressListener = keypressListener.bind(this);
                 this.cell = null;
                 this.cellDomIndex = 0;
                 this.cellWithFocus = null;
@@ -174,7 +160,6 @@ require('inativ-x-datagrid');
                 this.datagrid.contentWrapper.addEventListener('click', this.clickCellListener);
                 this.datagrid.contentWrapper.addEventListener('dblclick', this.dblClickCellListener);
                 document.addEventListener('click', this.clickOustsideDatagrid);
-                document.addEventListener('keydown', this.keypressListener);
             },
             removed: function removed() {
                 this.hide();
@@ -200,8 +185,6 @@ require('inativ-x-datagrid');
                 if(!this._isColumnEditable(cell.cellIndex)) {
                     return;
                 }
-
-                this.removeCellFocus();
 
                 this.dispatchEvent(new CustomEvent('startEditing', {
                     'detail': {
