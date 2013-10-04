@@ -2,11 +2,13 @@ var TestSuite = require('spatester');
 var datagrid, cellEditor;
 var datagridContent = [
     [
+        {value: "_1"},
         {value: "A1"},
         {value: "B1"},
         {value: "C1"}
     ],
     [
+        {value: "_2"},
         {value: "A2"},
         {value: "B2"},
         {value: "C2"}
@@ -27,6 +29,7 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
         datagrid.data = {
             colHeader: [
                 [
+                    {value: 'column0'},
                     {value: 'column1', editor: function () {
                         var input = document.createElement('input');
                         input.setAttribute('type', 'text');
@@ -74,20 +77,21 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
 testSuite.addTest("Affichage de l'edition sur un double click", function(scenario, asserter) {
     // Given
     scenario.wait('x-cell-editor')
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)");
+
 
     // Then
     asserter.expect('x-cell-editor').to.be.visible();
     asserter.expect('x-datagrid').to.returnTrue(function() {
-        var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)");
-        return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-    });
+        var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)");
+        return cellEditor.style.left === (editedCell.offsetLeft)+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
+    }, "L'editeur doit être position sur la cellule en édition");
 });
 
 testSuite.addTest("un double click sur une cellule non éditable ne fait rien", function(scenario, asserter) {
     // When
     scenario.wait('x-cell-editor')
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)");
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(4)");
 
     // Then
     asserter.expect('x-cell-editor').to.be.hidden();
@@ -96,8 +100,8 @@ testSuite.addTest("un double click sur une cellule non éditable ne fait rien", 
 testSuite.addTest("On ne peut avoir qu'une cellule en édition", function (scenario, asserter) {
     // When
     scenario.wait('x-cell-editor')
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)")
-        .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(1)");
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)")
+        .dblclick("x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)");
 
     // Then
     asserter.expect('x-cell-editor').to.have.nodeLength(1);
@@ -105,7 +109,7 @@ testSuite.addTest("On ne peut avoir qu'une cellule en édition", function (scena
 
 testSuite.addTest("Comportement du click outside", function (scenario, asserter) {
     // Given
-    var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
+    var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
     scenario.wait('x-cell-editor')
         .dblclick(cellSelector);
     var expectedValue = "toto";
@@ -125,7 +129,7 @@ testSuite.addTest("Comportement du click outside", function (scenario, asserter)
 testSuite.addTest("Comportement de la touche escape", function (scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // Given
-        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
         scenario.wait('x-cell-editor')
             .dblclick(cellSelector);
         var unExpectedValue = "toto";
@@ -144,7 +148,7 @@ testSuite.addTest("Comportement de la touche escape", function (scenario, assert
 testSuite.addTest("Comportement de la touche entrée", function (scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()){ //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // Given
-        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(1)";
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
         var expectedValue = "toto";
         scenario.wait('x-cell-editor')
             .dblclick(cellSelector)
@@ -164,7 +168,7 @@ testSuite.addTest("Comportement de la touche entrée", function (scenario, asser
 testSuite.addTest("La 1ère cellule éditable doit avoir le focus", function(scenario, asserter) {
     scenario.wait('x-datagrid');
 
-    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
+    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
 
     asserter.expect(firstEditableCellSelector).to.have.attr('focus');
 });
@@ -173,8 +177,8 @@ testSuite.addTest("Le click sur une cellule editable doit lui donner le focus", 
     scenario.wait('x-datagrid');
 
     // Given
-    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
-    var otherEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
+    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
+    var otherEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(3)";
 
     // When
     scenario.click(otherEditableCellSelector);
@@ -184,11 +188,26 @@ testSuite.addTest("Le click sur une cellule editable doit lui donner le focus", 
     asserter.expect(otherEditableCellSelector).to.have.attr('focus');
 });
 
+testSuite.addTest("Le click sur une cellule non editable ne doit pas lui donner le focus", function(scenario, asserter) {
+    scenario.wait('x-datagrid');
+
+    // Given
+    var firstEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
+    var otherNonEditableCellSelector = "x-datagrid .contentWrapper table tr:first-child td:nth-child(4)";
+
+    // When
+    scenario.click(otherNonEditableCellSelector);
+
+    // Then
+    asserter.expect(otherNonEditableCellSelector).to.not.have.attr('focus');
+    asserter.expect(firstEditableCellSelector).to.have.attr('focus');
+});
+
 testSuite.addTest("Le focus doit être conservé après un changement du content du datagrid", function(scenario, asserter) {
     scenario.wait('x-datagrid');
 
     // Given
-    var cell = "x-datagrid .contentWrapper table tr:first-child td:nth-child(1)";
+    var cell = "x-datagrid .contentWrapper table tr:first-child td:nth-child(2)";
 
     // When
     scenario.exec(function() {

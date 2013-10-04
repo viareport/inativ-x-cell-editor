@@ -39,15 +39,17 @@ require('inativ-x-datagrid');
     }
 
     // --- Callbacks
-    var clickCellListener = function (e) {
+    var dblClickCellListener = function (e) {
             var cell = getParentCell(e.target);
             if (cell) {
                 this.edit(cell);
             }
         },
-        cellClickListener = function(e) {
+        clickCellListener = function(e) {
             var cell = getParentCell(e.target);
-            this.focusCell(cell);
+            if(this._isColumnEditable(cell.cellIndex)) {
+                this.focusCell(cell);
+            }
         },
         inputKeyListener = function (e) {
             switch (e.keyCode) {
@@ -117,8 +119,8 @@ require('inativ-x-datagrid');
             created: function created() {
                 this.keyListener = inputKeyListener.bind(this);
                 this.clickoutsideListener = clickoutsideListener.bind(this);
+                this.dblClickCellListener = dblClickCellListener.bind(this);
                 this.clickCellListener = clickCellListener.bind(this);
-                this.cellClickListener = cellClickListener.bind(this);
                 this.cell = null;
                 this.cellDomIndex = 0;
                 this.cellWithFocus = null;
@@ -131,7 +133,7 @@ require('inativ-x-datagrid');
                 var firstColumn = null;
                 this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
                     if (columnDefinition.editor) {
-                        firstColumn = Math.min(columnIndex, firstColumn);
+                        firstColumn = firstColumn == null ? columnIndex : Math.min(columnIndex, firstColumn);
                         this._editableColumns.push(columnIndex);
                         this._editors[columnIndex] = columnDefinition.editor();
                     }
@@ -143,14 +145,14 @@ require('inativ-x-datagrid');
                 this.focusCell(firstEditableCell);
 
                 //TODO A déplacer dans bloc 'events'
-                this.datagrid.contentWrapper.addEventListener('click', this.cellClickListener);
-                this.datagrid.contentWrapper.addEventListener('dblclick', this.clickCellListener);
+                this.datagrid.contentWrapper.addEventListener('click', this.clickCellListener);
+                this.datagrid.contentWrapper.addEventListener('dblclick', this.dblClickCellListener);
             },
             removed: function removed() {
                 this.hide();
 
                 //TODO A Priori inutile
-                this.datagrid.contentWrapper.removeEventListener('dblclick', this.clickCellListener);
+                this.datagrid.contentWrapper.removeEventListener('dblclick', this.dblClickCellListener);
             },
             attributeChanged: function attributedChanged() {
             }
