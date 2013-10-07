@@ -132,7 +132,7 @@ require('inativ-x-datagrid');
             this.removeCellFocus();
         },
         keypressListener = function(e) {
-            if (KEYCODE.F2 === e.keyCode) {
+            if (KEYCODE.F2 === e.keyCode && this.cellWithFocus) {
                 var cell = this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y);
                 if (cell) {
                     this.edit(cell);
@@ -256,6 +256,9 @@ require('inativ-x-datagrid');
                 }));
 
                 this.cell = null;
+                while (this.firstChild) {
+                    this.removeChild(this.firstChild);
+                }
 
                 //TODO A Priori inutile
                 document.removeEventListener('keyup', this.keyListener, false);
