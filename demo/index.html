@@ -43,7 +43,7 @@
 </body>
 
 <script src="/lib/x-tag-core.js"></script>
-<script type="text/javascript" src="/demo/main.js"></script>
+<script type="text/javascript" src="/dist/main.js"></script>
 <script type="text/javascript">
     document.addEventListener('DOMComponentsLoaded', function () {
         var datagrid = document.querySelector('x-datagrid');
@@ -61,45 +61,63 @@
 
         datagrid.data = {
             colHeader: [
-            [
-            {value: 'column1', filter: true},
-            {value: 'column2', editor: function() {
-                var input = document.createElement('input');
-                input.setAttribute('type', 'text');
-                input.affectValue = function (value) {
-                    this.value = value;
-                };
-                input.getValue = function() {
-                    return this.value;
-                };
-                return input;
-            }},
-                    //TODO proposer d'autre input ex:select
-                    {value: 'column3', editor: function () {
-                        var input = document.createElement('input');
-                        input.setAttribute('type', 'text');
-                        input.affectValue = function (value) {
-                            this.value = value;
-                        };
-                        input.getValue = function () {
-                            return this.value;
-                        };
-                        return input;
-                    }},
-                    {value: 'column4'},
-                    {value: 'column5'}
-                    ]
-                    ],
-                    content: content
-                };
-                var editor = document.createElement('x-cell-editor');
-                datagrid.registerPlugin(editor);
-                datagrid.addEventListener('cellChanged', function(e) {
-                    var cell = e.detail.cell;
-                    content[cell.cellRow][cell.cellIndex].value = e.detail.newValue;
-                    datagrid.content = content;
-                });
-            }, false);
+                [
+                    {
+                        value: 'column1', filter: true
+                    },
+                    {
+                        value: 'column2', 
+                        editor: function() {
+                            var input = document.createElement('input');
+                            input.setAttribute('type', 'text');
+                            input.affectValue = function (value) {
+                                this.value = value;
+                            };
+                            input.getValue = function() {
+                                return this.value;
+                            };
+                            return input;
+                        }
+                    },
+                    // TODO proposer d'autre input ex:select
+                    {
+                        value: 'column3', 
+                        editor: function () {
+                                var select = document.createElement('select');
+                                var options = ['option1', 'option2', 'option3'];
+                                options.forEach(function(option, index) {
+                                    select.options[index] = new Option(option, option);
+                                });
+                                select.selected = 0;                            
+                                select.affectValue = function (value) {
+                                    var index = options.indexOf(value);
+                                    this.selected = index === -1 ? 0 : index;
+                                };
+                                select.getValue = function () {
+                                    return select.options[select.selectedIndex].value;
+                                };
+                                return select;
+                            }
+                    },
+                    {
+                        value: 'column4'
+                    },
+                    {
+                        value: 'column5'
+                    }
+                ]
+            ],
+            content: content
+        };
+        
+        var editor = document.createElement('x-cell-editor');
+        datagrid.registerPlugin(editor);
+        datagrid.addEventListener('cellChanged', function(e) {
+            var cell = e.detail.cell;
+            content[cell.cellRow][cell.cellIndex].value = e.detail.newValue;
+            datagrid.content = content;
+        });
+    }, false);
 
 </script>
 

@@ -1,161 +1,33 @@
 require('inativ-x-datagrid');
-(function () {
-    function doesSupportCustomEventConstructor() {
-        try {
-            if (new Event('submit', { bubbles: false }).bubbles !== false) {
-                return false;
-            } else if (new Event('submit', { bubbles: true }).bubbles !== true) {
-                return false;
-            } else if (new Event('submit', { detail: 'toto'}).detail !== 'toto') {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (e) {
-            return false;
-        }
-
-    }
-
-    if (!doesSupportCustomEventConstructor()) {
-        window.CustomEvent = function CustomEvent(event, params) {
-            params = params || { bubbles: false, cancelable: false, detail: undefined };
-            var evt = document.createEvent('CustomEvent');
-            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-            return evt;
-        };
-
-        window.CustomEvent.prototype = window.CustomEvent.prototype;
-    }
-})();
+require('./polyfill');
+var mouseListener = require('./mouseListener');
+var keyboardListener = require('./keyboardListener');
+var focusMgr = require('./focusMgr');
+var editMgr = require('./editMgr');
+var helper = require('./helper');
 
 (function () {
-    function getParentCell(node) {
-        var cell = node;
-        while (cell.nodeName.toLowerCase() !== 'td' && cell.parentNode) {
-            cell = cell.parentNode;
-        }
-        return cell;
-    }
-
-    var KEYCODE = {
-        "F2": 113,
-        "ENTRER": 13
-    }
-
-    // --- Callbacks
-    var dblClickCellListener = function (e) {
-            var cell = getParentCell(e.target);
-            if (cell) {
-                this.edit(cell);
-            }
-        },
-        clickCellListener = function(e) {
-            var cell = getParentCell(e.target);
-            if(this._isColumnEditable(cell.cellIndex)) {
-                this.focusCell(cell);
-            }
-        },
-        inputKeyListener = function (e) {
-            switch (e.keyCode) {
-                case 27: // ESC
-                    this.hide();
-                    this.cellWithFocus = this._oldCellWithFocus;
-                    this.focusCell(this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y));
-                    break;
-                case 13: // ENTER
-                    this.affectValue();
-                    this.hide();
-                    break;
-                // case 9: // TAB
-                //     if (!e.ctrlKey && !e.altKey) {
-                //         e.preventDefault();
-                //         e.stopPropagation();
-                //         this.affectValue();
-                //         if (e.shiftKey) {
-
-                //             this.moveLeft();
-                //         }
-                //         else {
-                //             this.moveRight();
-                //         }
-                //     }
-                //     break;
-
-                // case 37: // LEFT
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     this.affectValue();
-                //     this.moveLeft();
-                //     break;
-                // case 38: // UP
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     this.affectValue();
-                //     this.moveUp();
-                //     break;
-                // case 39: // right
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     this.affectValue();
-                //     this.moveRight();
-                //     break;
-                // case 40: // down
-                //     e.preventDefault();
-                //     e.stopPropagation();
-                //     this.affectValue();
-                //     this.moveDown();
-                //     break;
-            }
-        },
-        clickoutsideListener = function (e) {
-            var elt = e.target;
-            while (elt) {
-                if (elt === this || elt === this.cell) {
-                    return;
-                }
-                elt = elt.parentNode;
-            }
-            this.affectValue();
-            this.hide();
-            //  e.stopPropagation();
-        },
-        clickOustsideDatagrid = function(e) {
-            var elt = e.target;
-            while(elt) {
-                if (elt === this.datagrid.contentWrapper) {
-                    return;
-                }
-                elt = elt.parentNode;
-            }
-
-            this.removeCellFocus();
-        },
-        keypressListener = function(e) {
-            if (KEYCODE.F2 === e.keyCode && this.cellWithFocus) {
-                var cell = this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y);
-                if (cell) {
-                    this.edit(cell);
-                }
-            }
-        };
 
     xtag.register('x-cell-editor', {
         lifecycle: {
             created: function created() {
-                this.keyListener = inputKeyListener.bind(this);
-                this.clickoutsideListener = clickoutsideListener.bind(this);
-                this.dblClickCellListener = dblClickCellListener.bind(this);
-                this.clickCellListener = clickCellListener.bind(this);
-                this.clickOustsideDatagrid = clickOustsideDatagrid.bind(this);
-                this.keypressListener = keypressListener.bind(this);
+                this.clickoutsideListener = mouseListener.clickoutside.bind(this);
+                this.dblClickCellListener = mouseListener.dblClickCell.bind(this);
+                this.clickCellListener = mouseListener.clickCell.bind(this);
+                this.clickOutsideDatagrid = mouseListener.clickOutsideDatagrid.bind(this);
+
+                this.editionListener = keyboardListener.editionListener.bind(this);
+                this.focusListener = keyboardListener.focusListener.bind(this);
+
                 this.cell = null;
                 this.cellDomIndex = 0;
-                this.cellWithFocus = null;
-                this._oldCellWithFocus = null;
             },
 
             inserted: function inserted() {
+                helper.init(this);
+                focusMgr.init(this);
+                editMgr.init(this);
+
                 var cellEditor = this;
                 this._editableColumns = [];
                 this._editors = [];
@@ -171,19 +43,20 @@ require('inativ-x-datagrid');
                 this.style.display = 'none';
 
                 var firstEditableCell = this.datagrid.getCellAt(firstColumn, 0);
-                this.focusCell(firstEditableCell);
+                focusMgr.focusCell(firstEditableCell);
 
                 //TODO A déplacer dans bloc 'events'
                 this.datagrid.contentWrapper.addEventListener('click', this.clickCellListener);
                 this.datagrid.contentWrapper.addEventListener('dblclick', this.dblClickCellListener);
-                document.addEventListener('click', this.clickOustsideDatagrid);
-                document.addEventListener('keydown', this.keypressListener);
+                document.addEventListener('click', this.clickOutsideDatagrid);
+                document.addEventListener('keydown', this.focusListener, true);
             },
             removed: function removed() {
-                this.hide();
-
-                //TODO A Priori inutile
+                editMgr.hide();
                 this.datagrid.contentWrapper.removeEventListener('dblclick', this.dblClickCellListener);
+                this.datagrid.contentWrapper.removeEventListener('click', this.clickCellListener);
+                document.removeEventListener('click', this.clickOutsideDatagrid);
+                document.removeEventListener('keydown', this.focusListener, true);
             },
             attributeChanged: function attributedChanged() {
             }
@@ -198,15 +71,10 @@ require('inativ-x-datagrid');
         },
 
         methods: {
-            edit: function edit(cell) {
-
-                if(!this._isColumnEditable(cell.cellIndex)) {
-                    return;
-                }
-
-                this._oldCellWithFocus = this.cellWithFocus;
-                this.removeCellFocus();
-
+            onResize: function resize() {
+                this.calculateWidthAndLeft();
+            },
+            onEdit: function edit(cell) {
                 this.dispatchEvent(new CustomEvent('startEditing', {
                     'detail': {
                         cell: cell
@@ -214,10 +82,10 @@ require('inativ-x-datagrid');
                     'bubbles': true,
                     'cancelable': false
                 }));
-
                 var top = cell.offsetTop,
                     height = cell.clientHeight,
                     editor = this._editors[cell.cellIndex];
+                    
                 this.cell = cell;
                 this.cellDomIndex = cell.cellIndex + 1;
                 this.style.top = top + 'px';
@@ -230,21 +98,13 @@ require('inativ-x-datagrid');
                 this.appendChild(editor);
                 editor.focus();
 
-                /*
-                 this.inputField.value = this.cell.cellValue;
-                 this.inputField.select();*/
-
-                //TODO A déplacer dans bloc 'events'
-                document.addEventListener('keyup', this.keyListener, false);
+                document.addEventListener('keydown', this.editionListener, true);
                 document.addEventListener('click', this.clickoutsideListener, true);
             },
             append: function append() {
                 this.datagrid.contentWrapper.appendChild(this);
             },
-            onResize: function resize() {
-                this.calculateWidthAndLeft();
-            },
-            hide: function hide() {
+            onHide: function hide() {
                 this.style.display = 'none';
 
                 this.dispatchEvent(new CustomEvent('stopEditing', {
@@ -255,38 +115,12 @@ require('inativ-x-datagrid');
                     'cancelable': false
                 }));
 
-                this.cell = null;
                 while (this.firstChild) {
                     this.removeChild(this.firstChild);
                 }
 
-                //TODO A Priori inutile
-                document.removeEventListener('keyup', this.keyListener, false);
+                document.removeEventListener('keydown', this.editionListener, true);
                 document.removeEventListener('click', this.clickoutsideListener, true);
-                // this.inputField.setAttribute('value', '');
-            },
-            moveLeft: function moveLeft() {
-                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex-1),(this.cell.cellRow));
-                this._moveTo(nextCell);
-            },
-            moveRight: function moveRight() {
-                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex+1),(this.cell.cellRow));
-                this._moveTo(nextCell);
-            },
-            moveUp: function moveRight() {
-                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex),(this.cell.cellRow-1));
-                this._moveTo(nextCell);
-            },
-            moveDown: function moveRight() {
-                var nextCell = this.datagrid.getCellAt((this.cell.cellIndex),(this.cell.cellRow+1));
-                this._moveTo(nextCell);
-            },
-
-            _moveTo: function moveTo(cell) {
-                if (cell && this._isColumnEditable(cell.cellIndex)) {
-                    this.hide();
-                    this.edit(cell);
-                }
             },
 
             affectValue: function affectValue() {
@@ -302,7 +136,6 @@ require('inativ-x-datagrid');
                     });
                     this.dispatchEvent(event);
                 }
-
             },
             calculateWidthAndLeft: function calculateWidthAndLeft() {
                 var columnHeaderCell = this.datagrid.getThColumnHeader(this.cellDomIndex);
@@ -312,36 +145,9 @@ require('inativ-x-datagrid');
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
                 // this.style.width = columnHeaderCell.clientWidth + 'px';
             },
-            focusCell: function focusCell(cell) {
-                this.removeCellFocus();
-                this._focusCell(cell);
-                this.cellWithFocus = {
-                    x: cell.cellIndex,
-                    y: cell.cellRow
-                };
-            },
-            removeCellFocus: function removeCellFocus() {
-                var domCellWithFocus = this.datagrid.querySelector('[focus]');
-                if (domCellWithFocus && this.cellWithFocus) {
-                    domCellWithFocus.removeAttribute('focus');
-                    this.cellWithFocus = null;
-                } else if (domCellWithFocus && !this.cellWithFocus) {
-                    throw new Error("No cell should have attribute focus if we haven't register it !");
-                }
-            },
 
             onContentRendered: function onContentRendered() {
-                if(this.cellWithFocus) {
-                    this._focusCell(this.datagrid.getCellAt(this.cellWithFocus.x, this.cellWithFocus.y));
-                }
-            },
-
-            _focusCell: function _focusCell(cell) {
-                cell.setAttribute('focus', 'focus');
-            },
-
-            _isColumnEditable: function _isColumnEditable(columnIndex) {
-                return this._editors[columnIndex];
+                focusMgr.onContentRendered();
             }
         }
     });
