@@ -43,6 +43,13 @@ module.exports = function(grunt) {
                 dest: 'test/main.css'
             }
         },
+        copy: {
+            dist: {
+                files: [
+                    {src : ['src/*.js'], dest: 'dist/', flatten: true, expand: true, filter: 'isFile'},
+                ]
+            }
+        },
         connect: {
             demo: {
                 options:{
@@ -82,9 +89,9 @@ module.exports = function(grunt) {
                     'test/main.js': ['src/main.js', 'test/test.js']
                 }
             },
-            dist: {
+            demo: {
                 files: {
-                    'dist/main.js': ['src/main.js']
+                    'demo/main.js': ['src/main.js']
                 }
             }
         },
@@ -134,12 +141,15 @@ module.exports = function(grunt) {
         grunt.log.writeln("----------");
     });
 
-    grunt.registerTask('build', ['clean:build', 'compass', 'browserify:dist']);
-    grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:dist']);
+    grunt.registerTask('build', ['clean:build', 'compass', 'copy:dist']);
+    
+    grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo']);
     grunt.registerTask('demo', ['builddemo', 'launchDemo']);
-    grunt.registerTask('test', ['buildTest', 'mkdir:test-result', 'testem']);
-    grunt.registerTask('dist', ['test', 'bumpup']);
+
     grunt.registerTask('buildTest', ['build', 'clean:test', 'concat:test', 'browserify:test']);
+    grunt.registerTask('test', ['buildTest', 'mkdir:test-result', 'testem']);
+
+    grunt.registerTask('dist', ['test','clean:build','copy:dist','bumpup']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
     grunt.registerTask('default', ['buildTest', 'watch:test']);
