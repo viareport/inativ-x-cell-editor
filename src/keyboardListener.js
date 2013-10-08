@@ -24,6 +24,7 @@ keyboardListener.editionListener = function (e) {
             this.affectValue();
             editMgr.hide();
             focusMgr.refocusCell();
+            focusMgr.down();
             break;
         case KEYCODE.TAB:
             if (!e.ctrlKey && !e.altKey) {
@@ -47,6 +48,7 @@ keyboardListener.focusListener = function(e) {
     if(focusMgr.hasFocus()) {
         switch(e.keyCode) {
         case KEYCODE.F2 :
+        case KEYCODE.ENTER :
             var cell = focusMgr.focusedCell();
             if (cell) {
                 editMgr.edit(cell);
