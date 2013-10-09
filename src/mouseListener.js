@@ -17,6 +17,10 @@ mouseListener.dblClickCell = function(e) {
     if(!editMgr.isEditing) {
         var cell = getParentCell(e.target);
         if (cell) {
+            focusMgr.focusCellAt({
+                x: cell.cellIndex, 
+                y: cell.rowIndex
+            });
             editMgr.edit(cell);
         }
     }
@@ -24,7 +28,13 @@ mouseListener.dblClickCell = function(e) {
 
 mouseListener.clickCell = function(e) {
     if(!editMgr.isEditing) {
-        focusMgr.focusCell(getParentCell(e.target));
+        var target = getParentCell(e.target);
+        if(target) {
+            focusMgr.focusCellAt({
+                x: target.cellIndex, 
+                y: target.rowIndex
+            });
+        }
     }
 };
 

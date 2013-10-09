@@ -3,6 +3,17 @@ var focusMgr = {};
 
 var oldCellWithFocus, cellWithFocus;
 
+focusMgr._fixCoordinatesIfOutsideBounds = function(coords) {
+    if(coords.x < this.wc._editableColumns[0]) {
+        coords.y--;
+        coords.x = this.wc._editableColumns[this.wc._editableColumns.length-1];
+    } else if(coords.x > this.wc._editableColumns[this.wc._editableColumns.length-1]) {
+        coords.y++;
+        coords.x = this.wc._editableColumns[0];
+    }
+    return coords;
+};
+
 focusMgr.init = function(wc) {
     this.wc = wc;
     oldCellWithFocus = null;
@@ -18,23 +29,43 @@ focusMgr.focusedCell = function() {
 };
 
 focusMgr.right = function() {
-    this.focusCellAt(cellWithFocus.x+1,cellWithFocus.y);
+    this.focusCellAt(
+        this._fixCoordinatesIfOutsideBounds({
+            x: cellWithFocus.x+1,
+            y: cellWithFocus.y
+        })
+    );
 };
 
 focusMgr.left = function() {
-    this.focusCellAt(cellWithFocus.x-1,cellWithFocus.y);
+    this.focusCellAt(
+        this._fixCoordinatesIfOutsideBounds({
+            x: cellWithFocus.x-1,
+            y: cellWithFocus.y
+        })
+    );
 };
 
 focusMgr.up = function() {
-    this.focusCellAt(cellWithFocus.x,cellWithFocus.y-1);
+    this.focusCellAt(
+        this._fixCoordinatesIfOutsideBounds({
+            x:cellWithFocus.x,
+            y:cellWithFocus.y-1
+        })
+    );
 };
 
 focusMgr.down = function() {
-    this.focusCellAt(cellWithFocus.x, cellWithFocus.y+1);
+    this.focusCellAt(
+        this._fixCoordinatesIfOutsideBounds({
+            x:cellWithFocus.x,
+            y:cellWithFocus.y+1
+        })
+    );
 };
 
-focusMgr.focusCellAt = function(x, y) {
-    this.focusCell(this.wc.datagrid.getCellAt(x,y));
+focusMgr.focusCellAt = function(coords) {
+    this.focusCell(this.wc.datagrid.getCellAt(coords.x,coords.y));
 };
 
 focusMgr.focusCell = function(cell) {
@@ -53,7 +84,10 @@ focusMgr.focusCell = function(cell) {
 
 focusMgr.refocusCell = function() {
     if(oldCellWithFocus) {
-        this.focusCellAt(oldCellWithFocus.x, oldCellWithFocus.y);
+        this.focusCellAt({
+            x: oldCellWithFocus.x, 
+            y: oldCellWithFocus.y
+        });
     }
 };
 

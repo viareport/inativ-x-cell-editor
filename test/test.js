@@ -350,10 +350,47 @@ testSuite.addTest("Quand on sort du mode édition avec TAB, la cellule de droite
         var newValue = "new value";
 
         // When
-        scenario.debug();
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = newValue;
         }).keyboard('x-cell-editor', 'keydown', 'Tab', 9);
+
+        // Then
+        asserter.expect(nextCellSelector).to.have.attr('focus');
+        asserter.expect(cellSelector).to.have.html(newValue);
+    }
+});
+
+testSuite.addTest("Quand on sort du mode édition avec TAB, et que l'on est sur la dernière cellule éditable d'une ligne la 1ère cellule éditable de la ligne suivante prend le focus", function(scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)";
+        var nextCellSelector = "x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)";
+        scenario.wait('x-cell-editor').dblclick(cellSelector);
+        var newValue = "new value";
+
+        // When
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = newValue;
+        }).keyboard('x-cell-editor', 'keydown', 'Tab', 9);
+
+        // Then
+        asserter.expect(nextCellSelector).to.have.attr('focus');
+        asserter.expect(cellSelector).to.have.html(newValue);
+    }
+});
+
+testSuite.addTest("Quand on sort du mode édition avec SHIFT+TAB, et que l'on est sur la première cellule éditable d'une ligne la dernière cellule éditable de la ligne précédente prend le focus", function(scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(2) td:nth-child(2)";
+        var nextCellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)";
+        scenario.wait('x-cell-editor').dblclick(cellSelector);
+        var newValue = "new value";
+
+        // When
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = newValue;
+        }).keyboard('x-cell-editor', 'keydown', 'Tab', 9, true);
 
         // Then
         asserter.expect(nextCellSelector).to.have.attr('focus');
@@ -370,7 +407,6 @@ testSuite.addTest("Quand on sort du mode édition avec SHIFT+TAB, la cellule de 
         var newValue = "new value";
 
         // When
-        scenario.debug();
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = newValue;
         }).keyboard('x-cell-editor', 'keydown', 'Tab', 9, true);
@@ -390,7 +426,6 @@ testSuite.addTest("Quand on sort du mode édition avec un click, la cellule clic
         var newValue = "new value";
 
         // When
-        scenario.debug();
         scenario.exec(function() {
             document.querySelector('x-cell-editor input').value = newValue;
         }).click(nextCellSelector);
