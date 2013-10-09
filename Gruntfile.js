@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         clean: {
             build: ['dist/*.js', 'dist/*.css'],
-            test: ['test/testbuild.js', 'test/main.*', 'test/x-tag-core.js', 'testem*json', 'test-result/*'],
+            test: ['test/dist/*', 'testem*json', 'test-result/*'],
             demo: ['demo/*.js', 'demo/*.css']
         },
         compass: {
@@ -35,12 +35,20 @@ module.exports = function(grunt) {
                 ],
                 dest: 'demo/main.css'
             },
-            test: {
+            testcss: {
                 src: [
                     './node_modules/*/dist/*.css',
                     './dist/inativ-x.css'
                 ],
-                dest: 'test/main.css'
+                dest: 'test/dist/main.css'
+            },
+            testjs: {
+                src: [
+                    './test/pieces/testStart.js',
+                    './test/specs/*.js',
+                    './test/pieces/testEnd.js'
+                ],
+                dest: 'test/dist/testConcat.js'
             }
         },
         copy: {
@@ -72,7 +80,7 @@ module.exports = function(grunt) {
                 tasks: ['dev']
             },
             test: {
-                files: ['src/*.js', 'src/*.scss', 'test/test.js', 'test/TestemSuite.html', 'node_modules/inativ-*/src/*.js', 'node_modules/inativ-*/src/*.scss'],
+                files: ['src/*.js', 'src/*.scss', 'test/pieces/testStart.js', 'test/pieces/testEnd.js', 'test/specs/*.js', 'test/TestemSuite.html', 'node_modules/inativ-*/src/*.js', 'node_modules/inativ-*/src/*.scss'],
                 tasks: ['buildTest']
             },
             demo: {
@@ -86,7 +94,7 @@ module.exports = function(grunt) {
         browserify: {
             test: {
                 files: {
-                    'test/main.js': ['src/*.js', 'test/test.js']
+                    'test/dist/main.js': ['src/*.js', 'test/dist/testConcat.js']
                 }
             },
             demo: {
@@ -146,7 +154,7 @@ module.exports = function(grunt) {
     grunt.registerTask('builddemo', ['build', 'clean:demo', 'concat:demo', 'browserify:demo']);
     grunt.registerTask('demo', ['builddemo', 'launchDemo']);
 
-    grunt.registerTask('buildTest', ['build', 'clean:test', 'concat:test', 'browserify:test']);
+    grunt.registerTask('buildTest', ['build', 'clean:test', 'concat:testcss', 'concat:testjs', 'browserify:test']);
     grunt.registerTask('test', ['buildTest', 'mkdir:test-result', 'testem']);
 
     grunt.registerTask('dist', ['test','clean:build','copy:dist','bumpup']);
