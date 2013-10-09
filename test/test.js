@@ -48,6 +48,7 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
                         input.getValue = function() {
                             return this.value;
                         };
+                        input.setFocus = input.focus;
                         return input;
                     }
                 }, {
@@ -61,6 +62,7 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
                         input.getValue = function() {
                             return this.value;
                         };
+                        input.setFocus = input.focus;
                         return input;
                     }
                 }, {
