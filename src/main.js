@@ -96,7 +96,7 @@ var helper = require('./helper');
                 this.innerHTML = '';
                 editor.affectValue(cell.cellValue);
                 this.appendChild(editor);
-                editor.focus();
+                editor.setFocus();
 
                 document.addEventListener('keydown', this.editionListener, true);
                 document.addEventListener('click', this.clickoutsideListener, true);
