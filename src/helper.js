@@ -1,15 +1,17 @@
-var helper = {};
+var helper = {
+    wc: null
+};
+
+function isColumnEditable(columnIndex) {
+    return helper.wc._editors && helper.wc._editors[columnIndex];
+}
 
 helper.init = function(wc) {
     this.wc = wc;
 };
 
 helper.isCellEditable = function(cell) {
-    return cell && helper.isColumnEditable(cell.cellIndex);
-};
-
-helper.isColumnEditable = function(columnIndex) {
-    return this.wc._editors && this.wc._editors[columnIndex];
+    return cell && isColumnEditable(cell.cellIndex);
 };
 
 module.exports = helper;

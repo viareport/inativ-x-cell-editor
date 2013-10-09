@@ -1,6 +1,15 @@
-var editMgr = {};
 var helper = require('./helper');
 var focusMgr = require('./focusMgr');
+
+var editMgr = {
+    wc: null,
+    isEditing: false
+};
+
+function editAt(coords) {
+    var cell = editMgr.wc.datagrid.getCellAt(coords.x,coords.y);
+    focusMgr.edit(cell);
+}
 
 editMgr.init = function(wc) {
     this.wc = wc;
@@ -18,33 +27,37 @@ editMgr.edit = function(cell) {
     }
 };
 
-editMgr.isEditing = function() {
-    return this.isEditing;
-};
-
 editMgr.hide = function() {
     this.isEditing = false;
     this.wc.onHide();
 };
 
 editMgr.left = function() {
-    var nextCell = this.wc.datagrid.getCellAt((this.wc.cell.cellIndex-1),(this.wc.cell.cellRow));
-    this.edit(nextCell);
+    editAt({
+        x: this.wc.cell.cellIndex-1,
+        y: this.wc.cell.cellRow
+    });
 };
 
 editMgr.right = function() {
-    var nextCell = this.wc.datagrid.getCellAt((this.wc.cell.cellIndex+1),(this.wc.cell.cellRow));
-    this.edit(nextCell);
+    editAt({
+        x: this.wc.cell.cellIndex+1,
+        y: this.wc.cell.cellRow
+    });
 };
 
 editMgr.up = function() {
-    var nextCell = this.wc.datagrid.getCellAt((this.wc.cell.cellIndex),(this.wc.cell.cellRow-1));
-    this.edit(nextCell);
+    editAt({
+        x: this.wc.cell.cellIndex,
+        y: this.wc.cell.cellRow-1
+    });
 };
 
 editMgr.down = function() {
-    var nextCell = this.wc.datagrid.getCellAt((this.wc.cell.cellIndex),(this.wc.cell.cellRow+1));
-    this.edit(nextCell);
+    editAt({
+        x: this.wc.cell.cellIndex,
+        y: this.wc.cell.cellRow+1
+    });
 };
 
 module.exports = editMgr;

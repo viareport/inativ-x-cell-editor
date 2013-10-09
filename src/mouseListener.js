@@ -5,13 +5,13 @@ var helper = require('./helper');
 var mouseListener = {};
 
 
-var getParentCell = function getParentCell(node) {
+function getParentCell(node) {
     var cell = node;
     while (cell.nodeName.toLowerCase() !== 'td' && cell.parentNode) {
         cell = cell.parentNode;
     }
     return cell;
-};
+}
 
 mouseListener.dblClickCell = function(e) {
     if(!editMgr.isEditing) {

@@ -1,18 +1,29 @@
 var helper = require('./helper');
-var focusMgr = {};
 
 var oldCellWithFocus, cellWithFocus;
+var focusMgr = {
+    wc: null
+};
 
-focusMgr._fixCoordinatesIfOutsideBounds = function(coords) {
-    if(coords.x < this.wc._editableColumns[0]) {
+function fixCoordinatesIfOutsideBounds(coords) {
+
+    var xMin = focusMgr.wc._editableColumns[0];
+    var xMax = focusMgr.wc._editableColumns[focusMgr.wc._editableColumns.length-1];
+
+    if(coords.x < xMin) {
         coords.y--;
-        coords.x = this.wc._editableColumns[this.wc._editableColumns.length-1];
-    } else if(coords.x > this.wc._editableColumns[this.wc._editableColumns.length-1]) {
+        coords.x = xMax;
+    } else if(coords.x > xMax) {
         coords.y++;
-        coords.x = this.wc._editableColumns[0];
+        coords.x = xMin;
     }
     return coords;
-};
+}
+
+function fixAndFocusCellAt(coords) {
+    var fixedCoords = fixCoordinatesIfOutsideBounds(coords);
+    focusMgr.focusCellAt(fixedCoords);
+}
 
 focusMgr.init = function(wc) {
     this.wc = wc;
@@ -29,38 +40,38 @@ focusMgr.focusedCell = function() {
 };
 
 focusMgr.right = function() {
-    this.focusCellAt(
-        this._fixCoordinatesIfOutsideBounds({
+    fixAndFocusCellAt(
+        {
             x: cellWithFocus.x+1,
             y: cellWithFocus.y
-        })
+        }
     );
 };
 
 focusMgr.left = function() {
-    this.focusCellAt(
-        this._fixCoordinatesIfOutsideBounds({
+    fixAndFocusCellAt(
+        {
             x: cellWithFocus.x-1,
             y: cellWithFocus.y
-        })
+        }
     );
 };
 
 focusMgr.up = function() {
-    this.focusCellAt(
-        this._fixCoordinatesIfOutsideBounds({
+    fixAndFocusCellAt(
+        {
             x:cellWithFocus.x,
             y:cellWithFocus.y-1
-        })
+        }
     );
 };
 
 focusMgr.down = function() {
-    this.focusCellAt(
-        this._fixCoordinatesIfOutsideBounds({
+    fixAndFocusCellAt(
+        {
             x:cellWithFocus.x,
             y:cellWithFocus.y+1
-        })
+        }
     );
 };
 
