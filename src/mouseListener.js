@@ -38,7 +38,6 @@ mouseListener.clickoutside = function(e) {
     }
     this.affectValue();
     editMgr.hide();
-    e.stopPropagation();
 };
 
 mouseListener.clickOutsideDatagrid = function(e) {

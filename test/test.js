@@ -381,6 +381,26 @@ testSuite.addTest("Quand on sort du mode édition avec SHIFT+TAB, la cellule de 
     }
 });
 
+testSuite.addTest("Quand on sort du mode édition avec un click, la cellule clickée prend le focus et le changement est pris en compte", function(scenario, asserter) {
+    if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+        // Given
+        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)";
+        var nextCellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
+        scenario.wait('x-cell-editor').dblclick(cellSelector);
+        var newValue = "new value";
+
+        // When
+        scenario.debug();
+        scenario.exec(function() {
+            document.querySelector('x-cell-editor input').value = newValue;
+        }).click(nextCellSelector);
+
+        // Then
+        asserter.expect(nextCellSelector).to.have.attr('focus');
+        asserter.expect(cellSelector).to.have.html(newValue);
+    }
+});
+
 testSuite.addTest("Comportement de la touche tabulation en mode focus", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
