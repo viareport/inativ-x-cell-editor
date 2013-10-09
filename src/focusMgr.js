@@ -18,29 +18,34 @@ focusMgr.focusedCell = function() {
 };
 
 focusMgr.right = function() {
-    this.focusCell(this.wc.datagrid.getCellAt((cellWithFocus.x+1),(cellWithFocus.y)));
+    this.focusCellAt(cellWithFocus.x+1,cellWithFocus.y);
 };
 
 focusMgr.left = function() {
-    this.focusCell(this.wc.datagrid.getCellAt((cellWithFocus.x-1),(cellWithFocus.y)));
+    this.focusCellAt(cellWithFocus.x-1,cellWithFocus.y);
 };
 
 focusMgr.up = function() {
-    this.focusCell(this.wc.datagrid.getCellAt((cellWithFocus.x),(cellWithFocus.y-1)));
+    this.focusCellAt(cellWithFocus.x,cellWithFocus.y-1);
 };
 
 focusMgr.down = function() {
-    this.focusCell(this.wc.datagrid.getCellAt((cellWithFocus.x),(cellWithFocus.y+1)));
+    this.focusCellAt(cellWithFocus.x, cellWithFocus.y+1);
 };
 
-// TODO : next{Right/Left/Up/Down} utilisés par {move/focus}{Right/Left/Up/Down}
+focusMgr.focusCellAt = function(x, y) {
+    this.focusCell(this.wc.datagrid.getCellAt(x,y));
+};
 
 focusMgr.focusCell = function(cell) {
-    if(cell && helper.isCellEditable(cell)) {
+    if(!cell) {
+        throw new Error("Can't focus undefined cell");
+    }
+    if(helper.isCellEditable(cell)) {
         this.removeCellFocus();
         cellWithFocus = {
             x: cell.cellIndex,
-            y: cell.cellRow
+            y: cell.rowIndex
         };
         cell.setAttribute('focus', 'focus');
     }
@@ -48,7 +53,7 @@ focusMgr.focusCell = function(cell) {
 
 focusMgr.refocusCell = function() {
     if(oldCellWithFocus) {
-        this.focusCell(this.wc.datagrid.getCellAt(oldCellWithFocus.x, oldCellWithFocus.y));
+        this.focusCellAt(oldCellWithFocus.x, oldCellWithFocus.y);
     }
 };
 
