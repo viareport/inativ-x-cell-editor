@@ -9,7 +9,9 @@ editMgr.init = function(wc) {
 
 editMgr.edit = function(cell) {
     if (helper.isCellEditable(cell)) {
-        this.hide();
+        if (this.isEditing) {
+            this.hide();
+        }
         this.isEditing = true;
         focusMgr.removeCellFocus();
         this.wc.onEdit(cell);
