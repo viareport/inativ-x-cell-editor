@@ -1,4 +1,3 @@
-
 testSuite.addTest("Comportement de la touche escape en mode édition", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // Given
@@ -193,26 +192,23 @@ testSuite.addTest("Quand on sort du mode édition avec SHIFT+TAB, la cellule de 
 testSuite.addTest("Comportement de la touche tabulation en mode focus", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
-        scenario.keyboard('x-datagrid', 'keydown', 9, 9); // et hop, on part à droite 
+        scenario.wait('x-datagrid');
+        scenario.keyboard("body", 'keydown', 9, 9); // et hop, on part à droite 
 
-        // FIXME : ça marche pas et ça m'énerve !
-        // asserter.assertTrue(function () {
-        //     var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
-        //     return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-        // }, 'Le cell editor doit se superposer à la cellule de droite');
+        // Then
+        var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
+        asserter.expect(editedCellSelector).to.have.attr('focus');
     }
 });
 
-testSuite.addTest("Comportement de la touche flèche droite en mode focus", function(scenario, asserter) {
+testSuite.addTest("Comportement de la flcèhe droite en mode focus", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
-        scenario.keyboard('body', 'keydown', 39, 39); // et hop, on part à droite 
+        scenario.wait('x-datagrid');
+        scenario.keyboard("body", 'keydown', 39, 39); // et hop, on part à droite 
 
-
-        // FIXME : ça marche pas et ça m'énerve !
-        // asserter.assertTrue(function () {
-        //     var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
-        //     return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-        // }, 'Le cell editor doit se superposer à la cellule de droite');
+        // Then
+        var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
+        asserter.expect(editedCellSelector).to.have.attr('focus');
     }
 });

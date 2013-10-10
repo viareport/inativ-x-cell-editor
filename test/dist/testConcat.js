@@ -93,7 +93,6 @@ function assertCellEditorIsAboveCell(rowIndex, colIndex) {
         return cellEditor.style.left === (editedCell.offsetLeft) + "px" && cellEditor.style.top === editedCell.offsetTop + "px";
     };
 }
-
 testSuite.addTest("Comportement de la touche escape en mode édition", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // Given
@@ -288,27 +287,24 @@ testSuite.addTest("Quand on sort du mode édition avec SHIFT+TAB, la cellule de 
 testSuite.addTest("Comportement de la touche tabulation en mode focus", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
-        scenario.keyboard('x-datagrid', 'keydown', 9, 9); // et hop, on part à droite 
+        scenario.wait('x-datagrid');
+        scenario.keyboard("body", 'keydown', 9, 9); // et hop, on part à droite 
 
-        // FIXME : ça marche pas et ça m'énerve !
-        // asserter.assertTrue(function () {
-        //     var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
-        //     return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-        // }, 'Le cell editor doit se superposer à la cellule de droite');
+        // Then
+        var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
+        asserter.expect(editedCellSelector).to.have.attr('focus');
     }
 });
 
-testSuite.addTest("Comportement de la touche flèche droite en mode focus", function(scenario, asserter) {
+testSuite.addTest("Comportement de la flcèhe droite en mode focus", function(scenario, asserter) {
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
-        scenario.keyboard('body', 'keydown', 39, 39); // et hop, on part à droite 
+        scenario.wait('x-datagrid');
+        scenario.keyboard("body", 'keydown', 39, 39); // et hop, on part à droite 
 
-
-        // FIXME : ça marche pas et ça m'énerve !
-        // asserter.assertTrue(function () {
-        //     var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
-        //     return cellEditor.style.left === editedCell.offsetLeft+"px" && cellEditor.style.top === editedCell.offsetTop+"px";
-        // }, 'Le cell editor doit se superposer à la cellule de droite');
+        // Then
+        var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
+        asserter.expect(editedCellSelector).to.have.attr('focus');
     }
 });
 
@@ -451,24 +447,24 @@ testSuite.addTest("Un click sur une cellule en édition ne doit rien faire", fun
     asserter.expect('x-datagrid').to.returnTrue(assertCellEditorIsAboveCell(1, 2), "L'editeur doit être positionné sur la cellule en édition");
 });
 
-testSuite.addTest("Quand on sort du mode édition avec un click, la cellule clickée prend le focus et le changement est pris en compte", function(scenario, asserter) {
-    if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
-        // Given
-        var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)";
-        var nextCellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
-        scenario.wait('x-cell-editor').dblclick(cellSelector);
-        var newValue = "new value";
+// testSuite.addTest("Quand on sort du mode édition avec un click, la cellule clickée prend le focus et le changement est pris en compte", function(scenario, asserter) {
+//     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
+//         // Given
+//         var cellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(3)";
+//         var nextCellSelector = "x-datagrid .contentWrapper table tr:nth-child(1) td:nth-child(2)";
+//         scenario.wait('x-cell-editor').dblclick(cellSelector);
+//         var newValue = "new value";
 
-        // When
-        scenario.exec(function() {
-            document.querySelector('x-cell-editor input').value = newValue;
-        }).click(nextCellSelector);
+//         // When
+//         scenario.exec(function() {
+//             document.querySelector('x-cell-editor input').value = newValue;
+//         }).click(nextCellSelector);
 
-        // Then
-        asserter.expect(nextCellSelector).to.have.attr('focus');
-        asserter.expect(cellSelector).to.have.html(newValue);
-    }
-});
+//         // Then
+//         asserter.expect(nextCellSelector).to.have.attr('focus');
+//         asserter.expect(cellSelector).to.have.html(newValue);
+//     }
+// });
 document.addEventListener('DOMComponentsLoaded', function() {
     testSuite.run();
 });
