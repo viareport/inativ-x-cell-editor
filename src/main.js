@@ -72,7 +72,7 @@ var helper = require('./helper');
 
         methods: {
             onResize: function resize() {
-                this.calculateWidthAndLeft();
+                this.calculateDisplayPosition();
             },
             onEdit: function edit(cell) {
                 this.dispatchEvent(new CustomEvent('startEditing', {
@@ -82,17 +82,10 @@ var helper = require('./helper');
                     'bubbles': true,
                     'cancelable': false
                 }));
-                var top = cell.offsetTop,
-                    height = cell.clientHeight,
-                    editor = this._editors[cell.cellIndex];
-                    
                 this.cell = cell;
-                this.cellDomIndex = cell.cellIndex + 1;
-                this.style.top = top + 'px';
-                this.style.height = height + 'px';
-                this.style.display = 'inline-block';
-                this.calculateWidthAndLeft();
+                this.calculateDisplayPosition();
 
+                var editor = this._editors[cell.cellIndex];
                 this.innerHTML = '';
                 editor.affectValue(cell.cellValue);
                 this.appendChild(editor);
@@ -100,6 +93,28 @@ var helper = require('./helper');
 
                 document.addEventListener('keydown', this.editionListener, true);
                 document.addEventListener('click', this.clickoutsideListener, true);
+            },
+            calculateDisplayPosition: function() {
+                var cell = this.cell;
+
+                var top = cell.offsetTop,
+                // Normalement dans ce calcul il faudrait prendre en compte le border des td tr
+                    bottom = this.datagrid.contentWrapper.offsetHeight - (cell.offsetTop + cell.offsetHeight),
+                    height = cell.clientHeight,
+                    editor = this._editors[cell.cellIndex];
+
+                this.cellDomIndex = cell.cellIndex + 1;
+                if (helper.isBeforeMiddleDisplayInDatagrid(cell.cellRow)) {
+                    this.style.top = top + 'px';
+                    this.style.bottom = "";
+                } else {
+                    editor.listDisplay = "top";
+                    this.style.bottom = bottom + 'px';
+                    this.style.top = "";
+                }
+                this.style.height = height + 'px';
+                this.style.display = 'inline-block';
+                this.calculateWidthAndLeft();
             },
             append: function append() {
                 this.datagrid.contentWrapper.appendChild(this);
