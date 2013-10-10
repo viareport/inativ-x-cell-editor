@@ -76,10 +76,10 @@ focusMgr.down = function() {
 };
 
 focusMgr.focusCellAt = function(coords) {
-    this.focusCell(this.wc.datagrid.getCellAt(coords.x,coords.y));
+    this.focusCell(this.wc.datagrid.getCellAt(coords.x,coords.y), true);
 };
 
-focusMgr.focusCell = function(cell) {
+focusMgr.focusCell = function(cell, makeVisible) {
     if(cell) {
         if(helper.isCellEditable(cell)) {
             this.removeCellFocus();
@@ -88,7 +88,9 @@ focusMgr.focusCell = function(cell) {
                 y: cell.rowIndex
             };
             cell.setAttribute('focus', 'focus');
-            this.wc.datagrid.makeCellVisible(cell.rowIndex, cell.cellIndex);
+            if (makeVisible) {
+                this.wc.datagrid.makeCellVisible(cell.rowIndex, cell.cellIndex);
+            }
         }
     }
 };
@@ -115,7 +117,7 @@ focusMgr.removeCellFocus = function() {
 
 focusMgr.onContentRendered = function() {
     if(cellWithFocus) {
-        this.focusCell(this.focusedCell());
+        this.focusCell(this.focusedCell(), false);
     }
 };
 
