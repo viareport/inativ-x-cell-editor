@@ -77,6 +77,7 @@
                             input.getValue = function() {
                                 return this.value;
                             };
+                            input.setFocus = input.focus;
                             return input;
                         }
                     },
@@ -97,6 +98,7 @@
                                 select.getValue = function () {
                                     return select.options[select.selectedIndex].value;
                                 };
+                                select.setFocus = select.focus;
                                 return select;
                             }
                     },

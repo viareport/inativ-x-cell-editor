@@ -80,16 +80,16 @@ focusMgr.focusCellAt = function(coords) {
 };
 
 focusMgr.focusCell = function(cell) {
-    if(!cell) {
-        throw new Error("Can't focus undefined cell");
-    }
-    if(helper.isCellEditable(cell)) {
-        this.removeCellFocus();
-        cellWithFocus = {
-            x: cell.cellIndex,
-            y: cell.rowIndex
-        };
-        cell.setAttribute('focus', 'focus');
+    if(cell) {
+        if(helper.isCellEditable(cell)) {
+            this.removeCellFocus();
+            cellWithFocus = {
+                x: cell.cellIndex,
+                y: cell.rowIndex
+            };
+            cell.setAttribute('focus', 'focus');
+            this.wc.datagrid.makeCellVisible(cell.rowIndex, cell.cellIndex);
+        }
     }
 };
 

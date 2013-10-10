@@ -160,5 +160,6 @@ module.exports = function(grunt) {
     grunt.registerTask('dist', ['test','clean:build','copy:dist','bumpup']);
 
     grunt.registerTask('dev', ['subgrunt', 'build', 'watch']);
+    grunt.registerTask('watchdemo', ['builddemo', 'watch:demo']);
     grunt.registerTask('default', ['buildTest', 'watch:test']);
 };
