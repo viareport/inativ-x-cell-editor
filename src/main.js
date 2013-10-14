@@ -6,6 +6,11 @@ var focusMgr = require('./focusMgr');
 var editMgr = require('./editMgr');
 var helper = require('./helper');
 
+function callBackStopEvent(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
 (function () {
 
     xtag.register('x-cell-editor', {
@@ -71,10 +76,25 @@ var helper = require('./helper');
         },
 
         methods: {
+            stopScrollOnDatagrid: function () {
+                var domTrElements = this.datagrid.contentWrapper.querySelectorAll('tr');
+                var i = 0;
+                for (; i < domTrElements.length; i++) {
+                    domTrElements.item(i).addEventListener('wheel', callBackStopEvent, true);
+                }
+            },
+            restoreScrollOnDatagrid: function () {
+                var domTrElements = this.datagrid.contentWrapper.querySelectorAll('tr');
+                var i = 0;
+                for (; i < domTrElements.length; i++) {
+                    domTrElements.item(i).removeEventListener('wheel', callBackStopEvent, true);
+                }
+            },
             onResize: function resize() {
                 this.calculateDisplayPosition();
             },
             onEdit: function edit(cell) {
+                this.stopScrollOnDatagrid();
                 this.dispatchEvent(new CustomEvent('startEditing', {
                     'detail': {
                         cell: cell
@@ -97,23 +117,24 @@ var helper = require('./helper');
             calculateDisplayPosition: function() {
                 var cell = this.cell;
 
-                var top = cell.offsetTop,
-                // Normalement dans ce calcul il faudrait prendre en compte le border des td tr
-                    bottom = this.datagrid.contentWrapper.offsetHeight - (cell.offsetTop + cell.offsetHeight),
-                    height = cell.clientHeight,
-                    editor = this._editors[cell.cellIndex];
+                if(cell) {
+                    var top = cell.offsetTop,
+                    // Normalement dans ce calcul il faudrait prendre en compte le border des td tr
+                        bottom = this.datagrid.contentWrapper.offsetHeight - (cell.offsetTop + cell.clientHeight),
+                        height = cell.clientHeight,
+                        editor = this._editors[cell.cellIndex];
 
-                this.cellDomIndex = cell.cellIndex + 1;
-                if (helper.isBeforeMiddleDisplayInDatagrid(cell.cellRow)) {
-                    this.style.top = top + 'px';
-                    this.style.bottom = "";
-                } else {
-                    editor.listDisplay = "top";
-                    this.style.bottom = bottom + 'px';
-                    this.style.top = "";
+                    this.cellDomIndex = cell.cellIndex + 1;
+                    if (helper.isBeforeMiddleDisplayInDatagrid(cell.cellRow)) {
+                        this.style.top = top + 'px';
+                        this.style.bottom = "";
+                    } else {
+                        this.style.bottom = bottom + 'px';
+                        this.style.top = "";
+                    }
+                    this.style.height = height + 'px';
+                    this.style.display = 'inline-block';
                 }
-                this.style.height = height + 'px';
-                this.style.display = 'inline-block';
                 this.calculateWidthAndLeft();
             },
             append: function append() {
@@ -136,6 +157,7 @@ var helper = require('./helper');
 
                 document.removeEventListener('keydown', this.editionListener, true);
                 document.removeEventListener('click', this.clickoutsideListener, true);
+                this.restoreScrollOnDatagrid();
             },
 
             affectValue: function affectValue() {
