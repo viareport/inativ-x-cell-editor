@@ -193,7 +193,7 @@ testSuite.addTest("Comportement de la touche tabulation en mode focus", function
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
         scenario.wait('x-datagrid');
-        scenario.keyboard("body", 'keydown', 9, 9); // et hop, on part à droite 
+        scenario.keyboard("body", 'keydown', 9, 9); // et hop, on part à droite
 
         // Then
         var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");
@@ -205,7 +205,7 @@ testSuite.addTest("Comportement de la flcèhe droite en mode focus", function(sc
     if (scenario.keyboardNoChromeNoIE()) { //FIXME je suis trop malheureux de pas pouvoir tester dans IE et Chrome ( et je parle meme pas de safariri )
         // When
         scenario.wait('x-datagrid');
-        scenario.keyboard("body", 'keydown', 39, 39); // et hop, on part à droite 
+        scenario.keyboard("body", 'keydown', 39, 39); // et hop, on part à droite
 
         // Then
         var editedCellSelector = ("x-datagrid .contentWrapper table tr:first-child td:nth-child(3)");

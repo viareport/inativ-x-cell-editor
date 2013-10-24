@@ -98,7 +98,7 @@ focusMgr.focusCell = function(cell, makeVisible) {
 focusMgr.refocusCell = function() {
     if(oldCellWithFocus) {
         this.focusCellAt({
-            x: oldCellWithFocus.x, 
+            x: oldCellWithFocus.x,
             y: oldCellWithFocus.y
         });
     }

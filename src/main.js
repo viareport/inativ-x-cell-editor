@@ -33,21 +33,11 @@ function callBackStopEvent(e) {
                 focusMgr.init(this);
                 editMgr.init(this);
 
-                var cellEditor = this;
-                this._editableColumns = [];
-                this._editors = [];
-                var firstColumn = null;
-                this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
-                    if (columnDefinition.editor) {
-                        firstColumn = firstColumn == null ? columnIndex : Math.min(columnIndex, firstColumn);
-                        this._editableColumns.push(columnIndex);
-                        this._editors[columnIndex] = columnDefinition.editor();
-                    }
-                }.bind(this));
-
                 this.style.display = 'none';
 
-                var firstEditableCell = this.datagrid.getCellAt(firstColumn, 0);
+                this.prepareEditors();
+
+                var firstEditableCell = this.datagrid.getCellAt(this.getFirstEditableColumn(), 0);
                 focusMgr.focusCell(firstEditableCell);
 
                 //TODO A déplacer dans bloc 'events'
@@ -76,6 +66,26 @@ function callBackStopEvent(e) {
         },
 
         methods: {
+            getFirstEditableColumn: function() {
+                var firstEditableColumn = null;
+                this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
+                    if (columnDefinition.editor) {
+                        firstEditableColumn = firstEditableColumn == null ? columnIndex : Math.min(columnIndex, firstEditableColumn);
+                    }
+                });
+                return firstEditableColumn;
+            },
+
+            prepareEditors: function() {
+                this._editors = [];
+                this._editableColumns = [];
+                this.datagrid.header[0].forEach(function (columnDefinition, columnIndex) {
+                    if (columnDefinition.editor) {
+                        this._editableColumns.push(columnIndex);
+                        this._editors[columnIndex] = columnDefinition.editor();
+                    }
+                }.bind(this));
+            },
             stopScrollOnDatagrid: function () {
                 var domTrElements = this.datagrid.contentWrapper.querySelectorAll('tr');
                 var i = 0;
@@ -164,7 +174,7 @@ function callBackStopEvent(e) {
                 var editorValue = this._editors[this.cell.cellIndex].getValue();
                 if (editorValue !== this.cell.cellValue) {
                     var event = new CustomEvent('cellChanged', {
-                        'detail': { 
+                        'detail': {
                             cell: this.cell,
                             newValue: editorValue
                         },
@@ -185,6 +195,7 @@ function callBackStopEvent(e) {
 
             onContentRendered: function onContentRendered() {
                 focusMgr.onContentRendered();
+                this.prepareEditors();
             }
         }
     });
