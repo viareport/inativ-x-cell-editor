@@ -190,7 +190,7 @@ function callBackStopEvent(e) {
                     return;
                 }
                 this.style.left = columnHeaderCell.offsetLeft + 'px';
-                // this.style.width = columnHeaderCell.clientWidth + 'px';
+                this.style.width = columnHeaderCell.clientWidth + 'px';
             },
 
             onContentRendered: function onContentRendered() {
