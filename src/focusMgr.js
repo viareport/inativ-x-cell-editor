@@ -20,9 +20,16 @@ function fixCoordinatesIfOutsideBounds(coords) {
     return coords;
 }
 
-function fixAndFocusCellAt(coords) {
-    var fixedCoords = fixCoordinatesIfOutsideBounds(coords);
-    focusMgr.focusCellAt(fixedCoords);
+function fixAndFocusCellAt(offset) {
+    if(cellWithFocus) {
+        var fixedCoords = fixCoordinatesIfOutsideBounds(
+            {
+                x: cellWithFocus.x+offset.x,
+                y: cellWithFocus.y+offset.y
+            }
+        );
+        focusMgr.focusCellAt(fixedCoords);
+    }
 }
 
 focusMgr.init = function(wc) {
@@ -42,8 +49,8 @@ focusMgr.focusedCell = function() {
 focusMgr.right = function() {
     fixAndFocusCellAt(
         {
-            x: cellWithFocus.x+1,
-            y: cellWithFocus.y
+            x: 1,
+            y: 0
         }
     );
 };
@@ -51,8 +58,8 @@ focusMgr.right = function() {
 focusMgr.left = function() {
     fixAndFocusCellAt(
         {
-            x: cellWithFocus.x-1,
-            y: cellWithFocus.y
+            x: -1,
+            y: 0
         }
     );
 };
@@ -60,8 +67,8 @@ focusMgr.left = function() {
 focusMgr.up = function() {
     fixAndFocusCellAt(
         {
-            x:cellWithFocus.x,
-            y:cellWithFocus.y-1
+            x:0,
+            y:-1
         }
     );
 };
@@ -69,8 +76,8 @@ focusMgr.up = function() {
 focusMgr.down = function() {
     fixAndFocusCellAt(
         {
-            x:cellWithFocus.x,
-            y:cellWithFocus.y+1
+            x:0,
+            y:1
         }
     );
 };
