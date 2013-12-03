@@ -44,14 +44,14 @@ function callBackStopEvent(e) {
                 this.datagrid.contentWrapper.addEventListener('click', this.clickCellListener);
                 this.datagrid.contentWrapper.addEventListener('dblclick', this.dblClickCellListener);
                 document.addEventListener('click', this.clickOutsideDatagrid);
-                document.addEventListener('keydown', this.focusListener, true);
+                document.addEventListener('keydown', this.focusListener);
             },
             removed: function removed() {
                 editMgr.hide();
                 this.datagrid.contentWrapper.removeEventListener('dblclick', this.dblClickCellListener);
                 this.datagrid.contentWrapper.removeEventListener('click', this.clickCellListener);
                 document.removeEventListener('click', this.clickOutsideDatagrid);
-                document.removeEventListener('keydown', this.focusListener, true);
+                document.removeEventListener('keydown', this.focusListener);
             },
             attributeChanged: function attributedChanged() {
             }
@@ -121,7 +121,7 @@ function callBackStopEvent(e) {
                 this.appendChild(editor);
                 editor.setFocus();
 
-                document.addEventListener('keydown', this.editionListener, true);
+                document.addEventListener('keydown', this.editionListener);
                 document.addEventListener('click', this.clickoutsideListener, true);
             },
             calculateDisplayPosition: function() {
@@ -165,7 +165,7 @@ function callBackStopEvent(e) {
                     this.removeChild(this.firstChild);
                 }
 
-                document.removeEventListener('keydown', this.editionListener, true);
+                document.removeEventListener('keydown', this.editionListener);
                 document.removeEventListener('click', this.clickoutsideListener, true);
                 this.restoreScrollOnDatagrid();
             },

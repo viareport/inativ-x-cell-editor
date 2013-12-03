@@ -88,9 +88,18 @@ var testSuite = new TestSuite("inativ-x-cell-editor test", {
 });
 
 function assertCellEditorIsAboveCell(rowIndex, colIndex) {
+
+    function extractIntFromString(str) {
+        return parseInt(str.replace(/([^\d]*)/, ''), 10);
+    }
+
     return function() {
         var editedCell = document.querySelector("x-datagrid .contentWrapper table tr:nth-child(" + rowIndex + ") td:nth-child(" + colIndex + ")");
-        return cellEditor.style.left === (editedCell.offsetLeft) + "px" && cellEditor.style.top === editedCell.offsetTop + "px";
+
+        var isVerticallyAligned = cellEditor.style.left === (editedCell.offsetLeft) + "px";
+        var isHorizontallyAligned =  Math.abs(extractIntFromString(cellEditor.style.bottom) - (editedCell.offsetHeight+editedCell.offsetTop)) < 10;
+
+        return isVerticallyAligned && isHorizontallyAligned;
     };
 }
 testSuite.addTest("Comportement de la touche escape en mode édition", function(scenario, asserter) {
