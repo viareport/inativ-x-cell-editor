@@ -25,6 +25,7 @@ function callBackStopEvent(e) {
                 this.focusListener = keyboardListener.focusListener.bind(this);
 
                 this.cell = null;
+                this.editState = false;
                 this.cellDomIndex = 0;
             },
 
@@ -101,9 +102,12 @@ function callBackStopEvent(e) {
                 }
             },
             onResize: function resize() {
-                this.calculateDisplayPosition();
+                if(this.editState) {
+                    this.calculateDisplayPosition();
+                }
             },
             onEdit: function edit(cell) {
+                this.editState = true;
                 this.stopScrollOnDatagrid();
                 this.dispatchEvent(new CustomEvent('startEditing', {
                     'detail': {
@@ -151,6 +155,7 @@ function callBackStopEvent(e) {
                 this.datagrid.contentWrapper.appendChild(this);
             },
             onHide: function hide() {
+                this.editState = false;
                 this.style.display = 'none';
 
                 this.dispatchEvent(new CustomEvent('stopEditing', {
@@ -169,7 +174,6 @@ function callBackStopEvent(e) {
                 document.removeEventListener('click', this.clickoutsideListener, true);
                 this.restoreScrollOnDatagrid();
             },
-
             affectValue: function affectValue() {
                 var editorValue = this._editors[this.cell.cellIndex].getValue();
                 if (editorValue !== this.cell.cellValue) {
