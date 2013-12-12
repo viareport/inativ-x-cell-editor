@@ -28,8 +28,10 @@ editMgr.edit = function(cell) {
 };
 
 editMgr.hide = function() {
-    this.isEditing = false;
-    this.wc.onHide();
+    if(this.isEditing) {
+        this.isEditing = false;
+        this.wc.onHide();
+    }
 };
 
 editMgr.left = function() {
